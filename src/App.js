@@ -1,9 +1,10 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, Redirect, Navigate } from 'react-router-dom';
 import './App.css';
 import {getSupabaseClient} from './models/supabase'
 import Login from './pages/Login/Login';
-import Home from './pages/Home/Home';
 import Avatars from './pages/Avatars/Avatars';
+import Page404 from './pages/404/404';
+import Homepage from './pages/Home/Homepage';
 
 const supabase = getSupabaseClient();
 
@@ -11,9 +12,11 @@ function App() {
   return (
     <BrowserRouter basename='/'>
       <Routes>
-        <Route path='' element={<Home/>}/>
+        <Route exact path='/' element={<Navigate to="/home" replace={true}></Navigate>}></Route>
+        <Route path='/home/*' element={<Homepage/>}/>
         <Route path='login' element={<Login/>}/>
         <Route path='avatars' element={<Avatars/>}/>
+        <Route path='/*' element={<Page404/>}/>
       </Routes>
     </BrowserRouter>
   );
