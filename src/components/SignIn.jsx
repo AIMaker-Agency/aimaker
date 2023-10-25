@@ -20,7 +20,7 @@ function SignIn() {
         })
 
         if(!error){
-            navigate('/avatars')
+            // navigate('/avatars')
         }
     }
 

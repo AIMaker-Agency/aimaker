@@ -1,12 +1,20 @@
 import React, { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { getSupabaseClient } from '../models/supabase';
+import Modal from './Modal';
+import SignIn from './SignIn';
+import SignUp from './SignUp';
 
 function HomeNavBar() {
 
   const supabase = getSupabaseClient();
 
   const [session, setSession] = useState(null);
+  const [modal, setModal] = useState({
+    isShowing: false,
+    title: '',
+    isSignIn: true,
+  })
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -17,6 +25,9 @@ function HomeNavBar() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
+      if(session && session.user){
+        setModal({...modal, isShowing: false});
+      }
     }) 
 
     return () => subscription.unsubscribe()
@@ -33,8 +44,11 @@ function HomeNavBar() {
       </div>
       <div className='home-navbar-login-btns'>
         { !session ? <>
-        <a className='home-navbar-item'>Sign In</a>
-        <a className='home-navbar-item'>Sign Up</a></>
+        <a className='home-navbar-item' onClick={e => {
+          e.preventDefault();
+          setModal({...modal, title: 'Sign in', isShowing: true, isSignIn: true});
+        }}>Sign In</a>
+        <a className='home-navbar-item' onClick={e => {e.preventDefault(); setModal({...modal, title: 'Sign up', isShowing: true, isSignIn: false});;}}>Sign Up</a></>
         :
         <>
         <a className='home-navbar-item' onClick={(e) => {
@@ -43,6 +57,10 @@ function HomeNavBar() {
         }}>Log out</a>
         </>}
       </div>
+      {modal.isShowing ? 
+      <Modal title={modal.title} handleShow={() => {setModal({...modal, isShowing: false})}}>
+        {modal.isSignIn ? <SignIn/> : <SignUp/>}
+      </Modal> : <></>}
     </div>
   )
 }

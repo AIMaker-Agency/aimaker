@@ -5,6 +5,7 @@ import Login from './pages/Login/Login';
 import Avatars from './pages/Avatars/Avatars';
 import Page404 from './pages/404/404';
 import Homepage from './pages/Home/Homepage';
+import Profile from './pages/Profile/Profile';
 
 const supabase = getSupabaseClient();
 
@@ -16,6 +17,7 @@ function App() {
         <Route path='/home/*' element={<Homepage/>}/>
         <Route path='login' element={<Login/>}/>
         <Route path='avatars' element={<Avatars/>}/>
+        <Route path='profile/*' element={<Profile/>}/>
         <Route path='/*' element={<Page404/>}/>
       </Routes>
     </BrowserRouter>
