@@ -29,7 +29,7 @@ function Avatars() {
         data: { subscription },
       } = supabase.auth.onAuthStateChange((_event, session) => {
         setSession(session)
-        setUser(session.user)
+        if(session) setUser(session.user);
       }) 
 
       if(user){

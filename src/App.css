@@ -213,3 +213,45 @@ body {
   border-radius: 15px;
   object-fit : cover;
 }
+
+
+/* PROFILE CSS */
+
+.profile{
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.profile-content{
+  background-color: #FFFFFF99;
+  height: 60%;
+  width: 80%;
+  margin: 20% 10% 10% 10%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  border-radius: 15px;
+}
+
+.profile-video-container{
+  width: 12rem;
+  height: 12rem;
+  border-radius: 50%;
+  border: .7rem solid white;
+  position: absolute;
+  top: -40%;
+}
+
+.profile-video-player{
+  border-radius: inherit;
+  width: inherit;
+  height: inherit;
+}
+
+.profile-data{
+  width: 100%;
+  padding: 8% 5% 5% 5%;
+}

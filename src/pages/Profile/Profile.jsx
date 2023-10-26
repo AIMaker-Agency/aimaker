@@ -25,9 +25,10 @@ function Profile() {
     return (
         <div className='profile'>
             <div className="profile-content">
-                <div className='profile-video'><video controls autoPlay muted><source src={sourceData.videoUrl}/></video></div>
-                <div className='profile-name'>{user ? user.role : ''}</div>
-                <div>Hola mundo</div>
+                <div className='profile-video-container'>
+                    {sourceData.videoUrl && <><video className='profile-video-player' autoPlay muted loop><source src={sourceData.videoUrl}></source></video></>}
+                </div>
+                <div className='profile-data'>{user ? user.role : ''}</div>
             </div>
         </div>
     )
