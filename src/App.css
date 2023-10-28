@@ -64,6 +64,33 @@ body {
 
 .home-navbar-item:hover{
   background-color: #22222266;
+  cursor: pointer;
+}
+
+.home-navbar-dropdown{
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.home-navbar-dropdown-title{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.home-navbar-dropdown-icon{
+  margin-left: 1rem;
+}
+
+.home-navbar-dropdown-menu{
+  display: block;
+  position: absolute;
+  bottom: -4rem;
+  left: -1rem;
+  padding: 1rem 0px;
+  background-color: #eeeeee;
+  list-style: none;
 }
 
 /* MODAL CSS */

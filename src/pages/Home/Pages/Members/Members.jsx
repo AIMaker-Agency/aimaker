@@ -15,8 +15,7 @@ function Members() {
 
   return (
     <>
-      <div>5.Lorem ipsum, dolor sit amet consectetur adipisicing elit. Modi rerum, reprehenderit enim saepe necessitatibus aut eius debitis veritatis cum et quos hic nostrum a ad pariatur in placeat repudiandae unde!</div>
-      {membersData.users && console.log(membersData)}
+      {membersData.users && !membersData.error ? <div>{membersData.users.map((user, index) => {return <p key={index}>{user.id}</p>})}</div>: <div>Not users found</div>}
     </>
   )
 }

@@ -8,6 +8,7 @@ const supabase = getSupabaseClient()
 function Avatars() {
     
     const [session, setSession] = useState(null);
+    const [canCreateVideo, setCanCreateVideo] = useState(true);
     const [btnCreate, setBtnCreate] = useState({disabled: false, text: "Create video"});
     const [fileNames, setFilenames] = useState((Math.random() * 10).toString(36).replace('.', ''));
     const [talkText, setTalkText] = useState(null);
@@ -19,36 +20,56 @@ function Avatars() {
     });
 
     // video: "https://create-images-results.d-id.com/api_docs/assets/noelle.mp4",
+
     useEffect(() => {
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        setSession(session)
-        setUser(session.user)
-      })
-
-      const {
-        data: { subscription },
-      } = supabase.auth.onAuthStateChange((_event, session) => {
-        setSession(session)
-        if(session) setUser(session.user);
-      }) 
-
-      if(user){
-        setFilenames(user.id)
-          const { data: dataImage } = supabase
-                  .storage
-                  .from('d_id_pictures')
-                  .getPublicUrl(user.id+'.jpg');
-          
-          const { data: dataAudio } = supabase
-                  .storage
-                  .from('d_id_audios')
-                  .getPublicUrl(user.id+'.m4a'); 
-          
-          setSourceData({ ...sourceData, photo: dataImage.publicUrl, audio: dataAudio.publicUrl });
-      }
-
+    
+        const fetchInitialData = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            setSession(session)
+            if(session) setUser(session.user);
+        };
+    
+        const handleAuthChange = async (_event, session) => {
+            setSession(session)
+            if(session) setUser(session.user);
+        };
+    
+        fetchInitialData();
+    
+        const {data: { subscription },} = supabase.auth.onAuthStateChange(handleAuthChange);
+    
         return () => subscription.unsubscribe()
-    }, [user])
+    }, []);
+    
+    useEffect(() => {
+        if (user) {
+            setFilenames(user.id);
+            const fetchUserData = async () => {
+                const { data: dataImage } = supabase.storage.from('d_id_pictures').getPublicUrl(user.id + '.jpg');
+                const { data: dataAudio } = supabase.storage.from('d_id_audios').getPublicUrl(user.id + '.m4a');
+                
+                const {data, error} = await supabase.storage.from('d_id_pictures').list('', {search: user.id+'.jpg'});
+
+                if(data && data.length != 0 && !error){
+                    setSourceData({
+                        ...sourceData, 
+                        photo: dataImage.publicUrl, 
+                        audio: dataAudio.publicUrl 
+                    });
+                }
+            };
+            
+            fetchUserData();
+        } else {
+            const checkUserIP = async () => {
+                const value = await checkIp();
+                setCanCreateVideo(value);
+            };
+    
+            checkUserIP();
+        }
+    }, [user]);    
+    
 
     //DEFINE STYLES
     const talkAudioPlayerStyle = {
@@ -65,9 +86,8 @@ function Avatars() {
     }
 
     const handleUpload = async (e) => {
-        console.log(sourceData);
 
-        if (sourceData.audio && sourceData.photo && talkText !== "") {
+        if((user && ( sourceData.photo && talkText !== "")) || (!user && canCreateVideo && (sourceData.photo && talkText !== ""))){
             setBtnCreate({...btnCreate, disabled: true, text: "Loading..."})
             const d_id_body = {
                 script: {
@@ -90,8 +110,6 @@ function Avatars() {
             })
                 .then(response => {
                     const talkId = response.data.id;
-                    
-                    //CODIGO DE GUARDAR IP
 
                     const interval = setInterval(async () => {
                         axios.get('https://cors-anywhere.herokuapp.com/https://api.d-id.com/talks/'+talkId, {
@@ -106,37 +124,41 @@ function Avatars() {
                                     /////////////// VALIDATE THE VIDEO UPLOAD TO DATABASE
                                     fetch("https://cors-anywhere.herokuapp.com/"+response.data.result_url).then(res => res.blob()).then(blobFile => {
                                         let videoFile = new File([blobFile], "video_profile.mp4", { type: 'video/mp4' })
-                                        const {error: videoError } = supabase.storage.from('d_id_videos').upload(user.id+'/video_profile_'+talkId, videoFile, {
+                                        const {error: videoError } = supabase.storage.from('d_id_videos').upload(fileNames+'/video_profile_'+talkId, videoFile, {
                                             cacheControl: '3600',
                                             upsert: false
                                         })
                                         
                                         if(!videoError){
-                                            saveIP(user);
+                                            saveIP(user, talkId);
+                                            if(!user){
+                                                setCanCreateVideo(false);
+                                                deleteFiles(fileNames);
+                                            }
                                             setBtnCreate({...btnCreate, disabled: false, text: "Create video"});
                                             setSourceData({ ...sourceData, video: response.data.result_url });
                                         }
-                                    }).catch(err => console.log(err));
-                                    
+                                    }).catch(err => console.error(err));
                                 }
-                                console.log(response);
                                 clearInterval(interval);
                             }).catch(err => {
                                 clearInterval(interval);
                             })
                     }, 2000); // Poll every 5 seconds
                 })
-                .catch(error => console.log(error));
+                .catch(error => console.error(error));
+        }else if(!canCreateVideo){
+            alert("Ya has excedido el uso de la demo, registrate para utilizar");
         }
-        // setTimeout(() => { console.log('World!');  }, 10000);
+        
     }
 
     return (
         <div style={{ height: "100vh", display: "flex", alignItems: "center" }}>
             <div className='talk-container'>
                 <div className='talk-inputs-container'>
-                    <div>
-                        { sourceData.photo ? <label htmlFor='image'>
+                    <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
+                        { sourceData.photo || !user ? <label htmlFor='image'>
                             <input type='file' name='image' id='image' accept='.jpg,.png' onChange={async (e) => {
 
                                 const { error: uploadPhotoError } = await supabase.storage
@@ -158,6 +180,28 @@ function Avatars() {
                             }} hidden />
                             <div className='talk-picture-container'>{sourceData.photo ? <img className='talk-picture' src={sourceData.photo}/> : "Upload photo"}</div>
                         </label> : <div className='talk-picture-container'>{sourceData.photo ? <img className='talk-picture' src={sourceData.photo}/> : "No photo uploaded"}</div>}
+                        <label htmlFor='image'>
+                            <input type='file' name='image' id='image' accept='.jpg,.png' onChange={async (e) => {
+
+                                const { error: uploadPhotoError } = await supabase.storage
+                                    .from("d_id_pictures")
+                                    .upload(fileNames+'.jpg', e.target.files[0], {
+                                        cacheControl: '3600',
+                                        upsert: false
+                                    });
+
+                                if (!uploadPhotoError) {
+                                    const { data } = supabase
+                                        .storage
+                                        .from('d_id_pictures')
+                                        .getPublicUrl(fileNames+'.jpg')
+
+                                    setSourceData({ ...sourceData, photo: data.publicUrl });
+                                }
+                                
+                            }} hidden />
+                            <div className='talk-button-2'>Set new photo</div>
+                        </label>
                     </div>
                     {/* <div style={{ display: "flex", flexDirection: "column" }}>
                         {sourceData.audio ? <audio style={talkAudioPlayerStyle} controls preload="metadata">
@@ -191,8 +235,9 @@ function Avatars() {
                 </div>
                 <div className='talk-result-container'>
                     {sourceData.video && <>
-                        <video className='talk-video-player' autoPlay muted loop><source src={sourceData.video}></source></video>
-                        <button className='talk-button-2' onClick={(e) => {e.preventDefault()}}>Set as video presentation</button>
+                        <video className='talk-video-player' autoPlay controls muted><source src={sourceData.video}></source></video>
+                        {user && <button className='talk-button-2' onClick={(e) => {e.preventDefault()}}>Set as video presentation</button>}
+                        <a href={sourceData.video} className='talk-button-2' >Download</a>
                     </>}
                 </div>
             </div>
@@ -200,26 +245,28 @@ function Avatars() {
     )
 }
 
-function saveIP(user){
-    axios.get("https://api.ipify.org/?format=json").then(async response => {
-        let ip = response.data.ip;
-        const { data , error }  = await supabase.from("d_id_talks").select().eq("ip", ""+ip);
-        
-        if(!error){
-            if(data.length == 0){
-                const { error: err} = await supabase.from("d_id_talks").insert({talkId: "Prueba", userId: user ? user.id : null, ip: ip});
-                console.log(err);
-            }
-        }
-    })
+async function saveIP(user, talkId){
+    const {data: {ip}} = await axios.get("https://api.ipify.org/?format=json");
+    // const { data , error }  = await supabase.from("d_id_talks").select().eq("ip", ""+ip);
+    const { error: err} = await supabase.from("d_id_talks").insert({talkId: talkId, userId: user ? user.id : null, ip: ip});
 }
 
-function checkIp(){
-    axios.get("https://api.ipify.org/?format=json").then(async response => {
-        let ip = response.data.ip;
-        const { data , error }  = await supabase.from("d_id_talks").select().eq("ip", ""+ip);
-        
-        return (!error && data.length != 0);
-    })
+async function checkIp(){
+    /* RETURN TRUE IF AN UNREGISTERED USER HAVE THE IP SAVED */
+    const {data: {ip}} = await axios.get("https://api.ipify.org/?format=json");
+    const { data , error }  = await supabase.from("d_id_talks").select('userId').filter('ip','eq',ip,'and','userId','eq',null);
+    return (!error && data.length == 0);
+}
+
+async function deleteFiles(filename){
+    const { data: deletePictureData, error: deletePictureError } = await supabase
+        .storage
+        .from('d_id_pictures')
+        .remove([filename+'.jpg'])
+
+    const { data: deleteAudioData, error: deleteAudioError } = await supabase
+        .storage
+        .from('d_id_audios')
+        .remove([filename+'.m4a'])
 }
 export default Avatars

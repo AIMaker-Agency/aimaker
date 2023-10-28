@@ -4,6 +4,7 @@ import { getSupabaseClient } from '../models/supabase';
 import Modal from './Modal';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
+import MenuItem from './MenuItem';
 
 function HomeNavBar() {
 
@@ -15,6 +16,27 @@ function HomeNavBar() {
     title: '',
     isSignIn: true,
   })
+
+  const MenuItems = [{
+    url: './', title: 'Home',
+  },
+  {
+    url: './imagine', title: 'Imagine',
+  },
+  {
+    url: './ido2020', title: 'IDO 2020',
+  },
+  // {
+  //   url: './social-contract', title: 'About social contract',
+  // },
+  {
+    url: './members', title: 'Members',
+  },
+  {
+    url: './', title: 'Demos', submenu: [{
+      url: '../avatars', title: 'Avatars',
+    }]
+  },]
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -36,11 +58,7 @@ function HomeNavBar() {
   return (
     <div className='home-navbar'>
       <div className='home-navbar-items'>
-        <NavLink className={'home-navbar-item'} to={"./"} >Home</NavLink>
-        <NavLink className={'home-navbar-item'} to={"./imagine"}>Imagine</NavLink>
-        <NavLink className={'home-navbar-item'} to={"./ido2020"}>IDO 2020</NavLink>
-        <NavLink className={'home-navbar-item'} to={"./social-contract"}>About social contract</NavLink>
-        <NavLink className={'home-navbar-item'} to={"./members"}>Members</NavLink>
+        {MenuItems && MenuItems.map((item, index) => <MenuItem key={'menu-item-'+index} item={item}/>)}
       </div>
       <div className='home-navbar-login-btns'>
         { !session ? <>

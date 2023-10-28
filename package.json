@@ -2,7 +2,6 @@
   "name": "aimaker",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://aimaker-agency.github.io/aimaker/",
   "dependencies": {
     "@supabase/auth-ui-react": "^0.4.5",
     "@supabase/auth-ui-shared": "^0.1.7",
