@@ -143,6 +143,7 @@ function Avatars() {
                                 }
                                 clearInterval(interval);
                             }).catch(err => {
+                                console.log(err)
                                 clearInterval(interval);
                             })
                     }, 2000); // Poll every 5 seconds
