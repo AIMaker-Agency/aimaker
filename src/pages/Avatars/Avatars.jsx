@@ -111,7 +111,7 @@ function Avatars() {
                 .then(response => {
                     const talkId = response.data.id;
 
-                    const interval = setInterval(async () => {
+                    const interval = setInterval(() => {
                         axios.get('https://api.d-id.com/talks/'+talkId, {
                                 headers: {
                                     accept: 'application/json',
