@@ -34,6 +34,8 @@ body {
   padding: 2rem;
   border-radius: 1rem;
   height: calc(100vh - 10rem);
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  font-size: large;
 }
 
 .home-navbar{

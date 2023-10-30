@@ -122,7 +122,8 @@ function Avatars() {
                             .then(response => {
                                 if (response.data.status === "done") {
                                     /////////////// VALIDATE THE VIDEO UPLOAD TO DATABASE
-                                    fetch("https://cors-anywhere.herokuapp.com/"+response.data.result_url).then(res => res.blob()).then(blobFile => {
+                                    // "https://cors-anywhere.herokuapp.com/"+
+                                    fetch(response.data.result_url).then(res => res.blob()).then(blobFile => {
                                         let videoFile = new File([blobFile], "video_profile.mp4", { type: 'video/mp4' })
                                         const {error: videoError } = supabase.storage.from('d_id_videos').upload(fileNames+'/video_profile_'+talkId, videoFile, {
                                             cacheControl: '3600',
