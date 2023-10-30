@@ -112,7 +112,7 @@ function Avatars() {
                     const talkId = response.data.id;
 
                     const interval = setInterval(async () => {
-                        axios.get('https://cors-anywhere.herokuapp.com/https://api.d-id.com/talks/'+talkId, {
+                        axios.get('https://api.d-id.com/talks/'+talkId, {
                                 headers: {
                                     accept: 'application/json',
                                     'content-type': 'application/json',
