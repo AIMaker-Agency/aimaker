@@ -138,10 +138,11 @@ function Avatars() {
                                             }
                                             setBtnCreate({...btnCreate, disabled: false, text: "Create video"});
                                             setSourceData({ ...sourceData, video: response.data.result_url });
+                                            // clearInterval(interval);
                                         }
                                     }).catch(err => console.error(err));
+                                    clearInterval(interval);
                                 }
-                                clearInterval(interval);
                             }).catch(err => {
                                 console.log(err)
                                 clearInterval(interval);
