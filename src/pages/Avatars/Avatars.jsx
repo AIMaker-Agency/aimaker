@@ -112,7 +112,7 @@ function Avatars() {
                     const talkId = response.data.id;
 
                     const interval = setInterval(() => {
-                        axios.get('https://api.d-id.com/talks/'+talkId, {headers: {"Access-Control-Allow-Origin": "*"}}, {
+                        axios.get('https://api.d-id.com/talks/'+talkId, {
                                 headers: {
                                     accept: 'application/json',
                                     'content-type': 'application/json',
