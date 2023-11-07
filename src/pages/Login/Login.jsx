@@ -1,24 +1,37 @@
-import React, { useState } from 'react'
-import SignIn from '../../components/SignIn';
-import SignUp from '../../components/SignUp';
+import React, { useState } from "react";
+import SignIn from "../../components/SignIn";
+import SignUp from "../../components/SignUp";
 
 function Login() {
+  const [isSignUp, setIsSignUp] = useState(false);
 
-    const [isSignUp, setIsSignUp] = useState(false);
-
-    return (
+  return (
     <>
-        <div>
-            <h1>AIMaker</h1>
-            <h3>Login</h3>
-            <li>
-                <ul onClick={(e) => {e.preventDefault(); setIsSignUp(false)}}>Sign In</ul>
-                <ul onClick={(e) => {e.preventDefault(); setIsSignUp(true)}}>Sign Up</ul>
-            </li>
-            {isSignUp ? <SignUp/> : <SignIn/>}
-        </div>
+      <div>
+        <h1>AIMaker</h1>
+        <h3>Login</h3>
+        <li>
+          <ul
+            onClick={(e) => {
+              e.preventDefault();
+              setIsSignUp(false);
+            }}
+          >
+            Sign In
+          </ul>
+          <ul
+            onClick={(e) => {
+              e.preventDefault();
+              setIsSignUp(true);
+            }}
+          >
+            Sign Up
+          </ul>
+        </li>
+        {isSignUp ? <SignUp /> : <SignIn />}
+      </div>
     </>
-    );
+  );
 }
 
-export default Login
+export default Login;
