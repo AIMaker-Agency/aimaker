@@ -276,7 +276,7 @@ function Avatars() {
                 onChange={async (e) => {
                   const { error: uploadPhotoError } = await supabase.storage
                     .from(bucket_d_id_pictures)
-                    .upload(fileNames + ".jpg", e.target.files[0], {
+                    .update(fileNames + ".jpg", e.target.files[0], {
                       cacheControl: "3600",
                       upsert: false,
                     });
@@ -310,7 +310,7 @@ function Avatars() {
                     onChange={async (e) => {
                       const { error: uploadAudioError } = await supabase.storage
                         .from(bucket_d_id_audios)
-                        .upload(fileNames + ".m4a", e.target.files[0], {
+                        .update(fileNames + ".m4a", e.target.files[0], {
                           cacheControl: "3600",
                           upsert: false,
                         });
