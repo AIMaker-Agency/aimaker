@@ -5,6 +5,7 @@ import axios from "axios";
 import {
   bucket_d_id_audios,
   bucket_d_id_pictures,
+  bucket_d_id_videos,
 } from "../../models/supabase-constants";
 
 const supabase = getSupabaseClient();
@@ -119,6 +120,7 @@ function Avatars() {
         sourceData.audio &&
         talkText !== "")
     ) {
+      setSourceData({ ...sourceData, video: null });
       setBtnCreate({ ...btnCreate, disabled: true, text: "Loading..." });
       const d_id_body = {
         script: {
@@ -169,13 +171,13 @@ function Avatars() {
                         { type: "video/mp4" }
                       );
                       const { error: videoError } = supabase.storage
-                        .from("d_id_videos")
+                        .from(bucket_d_id_videos)
                         .upload(
                           fileNames + "/video_profile_" + talkId,
                           videoFile,
                           {
                             cacheControl: "3600",
-                            upsert: false,
+                            upsert: true,
                           }
                         );
 
@@ -192,7 +194,10 @@ function Avatars() {
                         });
                         setSourceData({
                           ...sourceData,
-                          video: response.data.result_url,
+                          video:
+                            response.data.result_url +
+                            "?_=" +
+                            new Date().getTime(),
                         });
                         // clearInterval(interval);
                       }
@@ -233,11 +238,18 @@ function Avatars() {
                   id="image"
                   accept=".jpg,.png,.jpeg"
                   onChange={async (e) => {
+                    // const { dataList, errorList } = await supabase.storage
+                    //   .from(bucket_d_id_pictures)
+                    //   .list();
+
+                    // console.log(dataList);
+                    // console.log(errorList);
+
                     const { error: uploadPhotoError } = await supabase.storage
                       .from(bucket_d_id_pictures)
-                      .upload(fileNames + ".jpg", e.target.files[0], {
+                      .upload("./" + fileNames + ".jpg", e.target.files[0], {
                         cacheControl: "3600",
-                        upsert: false,
+                        upsert: true,
                       });
 
                     if (!uploadPhotoError) {
@@ -274,11 +286,17 @@ function Avatars() {
                 id="image"
                 accept="image/*"
                 onChange={async (e) => {
+                  // const { dataList, errorList } = await supabase.storage
+                  //   .from(bucket_d_id_pictures)
+                  //   .list();
+
+                  // console.log(dataList);
+                  // console.log(errorList);
                   const { error: uploadPhotoError } = await supabase.storage
                     .from(bucket_d_id_pictures)
-                    .update(fileNames + ".jpg", e.target.files[0], {
+                    .upload(fileNames + ".jpg", e.target.files[0], {
                       cacheControl: "3600",
-                      upsert: false,
+                      upsert: true,
                     });
 
                   if (!uploadPhotoError) {
@@ -286,7 +304,10 @@ function Avatars() {
                       .from(bucket_d_id_pictures)
                       .getPublicUrl(fileNames + ".jpg");
 
-                    setSourceData({ ...sourceData, photo: data.publicUrl });
+                    setSourceData({
+                      ...sourceData,
+                      photo: data.publicUrl + "?_=" + new Date().getTime(),
+                    });
                   }
                 }}
                 hidden
@@ -310,9 +331,9 @@ function Avatars() {
                     onChange={async (e) => {
                       const { error: uploadAudioError } = await supabase.storage
                         .from(bucket_d_id_audios)
-                        .update(fileNames + ".m4a", e.target.files[0], {
+                        .upload(fileNames + ".m4a", e.target.files[0], {
                           cacheControl: "3600",
-                          upsert: false,
+                          upsert: true,
                         });
 
                       if (!uploadAudioError) {
