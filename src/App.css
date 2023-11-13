@@ -1,15 +1,15 @@
 * {
- margin: 0px;
- padding: 0px;
+  margin: 0px;
+  padding: 0px;
 }
 
-*:focus{
+*:focus {
   outline: none;
 }
 
 body {
   height: 100vh;
-  background-image: url("https://wdxnodtudsmmrewbxyvy.supabase.co/storage/v1/object/sign/assets/aimaker_background.jpg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJhc3NldHMvYWltYWtlcl9iYWNrZ3JvdW5kLmpwZyIsImlhdCI6MTY5NzgyMTQ0NCwiZXhwIjoyMzI4NTQxNDQ0fQ.AY_HHZj-eLwnTFTs1QLCjgB6iW3L_8VwTdQtlrBSL4k&t=2023-10-20T17%3A04%3A05.679Z") ;
+  background-image: url("https://wdxnodtudsmmrewbxyvy.supabase.co/storage/v1/object/sign/assets/aimaker_background.jpg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJhc3NldHMvYWltYWtlcl9iYWNrZ3JvdW5kLmpwZyIsImlhdCI6MTY5NzgyMTQ0NCwiZXhwIjoyMzI4NTQxNDQ0fQ.AY_HHZj-eLwnTFTs1QLCjgB6iW3L_8VwTdQtlrBSL4k&t=2023-10-20T17%3A04%3A05.679Z");
   margin: 0;
   padding: 0;
   background-size: cover;
@@ -19,30 +19,30 @@ body {
 }
 
 /* HOME CSS */
-.home{
+.home {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.home-title{
+.home-title {
   color: white;
   font-size: 5rem;
   text-align: center;
-  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
 }
 
-.home-content{
+.home-content {
   background-color: white;
   width: 80%;
   padding: 2rem;
   border-radius: 1rem;
   height: calc(100vh - 10rem);
-  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
   font-size: large;
 }
 
-.home-navbar{
+.home-navbar {
   background-color: #eeeeee;
   width: 80%;
   padding: 0px 2rem;
@@ -52,44 +52,44 @@ body {
   justify-content: space-between;
 }
 
-.home-navbar-items{
+.home-navbar-items {
   display: flex;
 }
 
-.home-navbar-login-btns{
+.home-navbar-login-btns {
   display: flex;
 }
 
-.home-navbar-item{
+.home-navbar-item {
   padding: 1rem;
   text-decoration: none;
-  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
   color: #222222;
   font-weight: bold;
 }
 
-.home-navbar-item:hover{
+.home-navbar-item:hover {
   background-color: #22222266;
   cursor: pointer;
 }
 
-.home-navbar-dropdown{
+.home-navbar-dropdown {
   display: flex;
   flex-direction: column;
   position: relative;
 }
 
-.home-navbar-dropdown-title{
+.home-navbar-dropdown-title {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.home-navbar-dropdown-icon{
+.home-navbar-dropdown-icon {
   margin-left: 1rem;
 }
 
-.home-navbar-dropdown-menu{
+.home-navbar-dropdown-menu {
   display: block;
   position: absolute;
   bottom: -4rem;
@@ -101,18 +101,18 @@ body {
 
 /* INPUTS AND BUTTONS CSS */
 
-.text-input{
-  width: 100%; 
+.text-input {
+  width: 100%;
   height: 2rem;
-  padding: .3rem;
+  padding: 0.3rem;
   border-radius: 5px;
   border: none;
   box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
 }
 
-.button-1{
+.button-1 {
   width: fit-content;
-  padding: .4rem 1.2rem;
+  padding: 0.4rem 1.2rem;
   border-radius: 5px;
   border: none;
   background-color: #76d736;
@@ -121,23 +121,31 @@ body {
   box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px, rgba(0, 0, 0, 0.23) 0px 1px 4px;
 }
 
-.button-1:hover{
+.button-1:disabled {
+  cursor: not-allowed;
+  background-color: #5aa32a;
+}
+
+.button-1:hover {
   box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
   cursor: pointer;
 }
 
 /* SignUp SignIn CSS */
 
-.sign-up-message-error, .sign-in-message-error{
+.sign-up-message-error,
+.sign-in-message-error,
+.change-pass-message-error {
   background-color: #ff9c9c;
   color: red;
-  padding: .7rem;
+  padding: 0.7rem;
   width: 100%;
   border-radius: 5px;
-  border: .1rem solid red;
+  border: 0.1rem solid red;
 }
 
-.sign-up-container, .sign-in-container{
+.sign-up-container,
+.sign-in-container {
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -149,7 +157,7 @@ body {
 }
 
 /* MODAL CSS */
-.modal{
+.modal {
   position: fixed;
   top: 0;
   left: 0;
@@ -161,7 +169,7 @@ body {
   justify-content: center;
 }
 
-.modal-container{
+.modal-container {
   width: 30%;
   height: fit-content;
   background-color: #eeeeee;
@@ -171,41 +179,41 @@ body {
   flex-direction: column;
 }
 
-.modal-title-bar{
+.modal-title-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.modal-title{
+.modal-title {
   color: black;
   font-size: 1.5rem;
-  font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
   text-align: center;
   font-weight: bold;
 }
 
-.modal hr{
+.modal hr {
   border: 1px solid black;
-  margin: .2rem 0px;
+  margin: 0.2rem 0px;
 }
 
-.modal-content{
+.modal-content {
   flex-grow: 1;
 }
 
 /* AVATARS CSS */
 
-.talk-container{
+.talk-container {
   display: flex;
   width: 80%;
   margin: 0px 10%;
-  background-color: #FFFFFF66;
+  background-color: #ffffff66;
   border-radius: 2rem;
   height: 80%;
 }
 
-.talk-inputs-container{
+.talk-inputs-container {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
@@ -217,29 +225,7 @@ body {
   justify-content: space-evenly;
 }
 
-.talk-picture-container{
-  background-color: #aaa;
-  border-radius: 50%;
-  border: 4px solid white;
-  color: white; 
-  width: 10rem; 
-  height: 10rem; 
-  display: flex; 
-  align-items: center; 
-  justify-content: center;
-}
-
-.talk-result-container{
-  flex-grow: 1;
-  width: 100%;
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.talk-picture-container{
+.talk-picture-container {
   background-color: #aaa;
   border-radius: 50%;
   border: 4px solid white;
@@ -251,61 +237,82 @@ body {
   justify-content: center;
 }
 
-.talk-picture{
+.talk-result-container {
+  flex-grow: 1;
+  width: 100%;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.talk-picture-container {
+  background-color: #aaa;
+  border-radius: 50%;
+  border: 4px solid white;
+  color: white;
+  width: 10rem;
+  height: 10rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.talk-picture {
   width: inherit;
   height: inherit;
   border-radius: inherit;
 }
 
-.talk-button{
+.talk-button {
   background-color: #76d736;
   width: fit-content;
   color: white;
   border: none;
-  padding: .4rem 1rem;
-  margin: .4rem;
-  border-radius: .4rem;
+  padding: 0.4rem 1rem;
+  margin: 0.4rem;
+  border-radius: 0.4rem;
   cursor: pointer;
 }
 
-.talk-button-2{
+.talk-button-2 {
   color: #76d736;
   width: fit-content;
   background-color: white;
   border: none;
-  padding: .4rem 1rem;
-  margin: .4rem;
-  border-radius: .4rem;
+  padding: 0.4rem 1rem;
+  margin: 0.4rem;
+  border-radius: 0.4rem;
   cursor: pointer;
 }
 
-.talk-button:disabled{
+.talk-button:disabled {
   background-color: #5aa32a;
   cursor: not-allowed;
 }
 
-.talk-textarea{
-  background-color: #FFFFFF99;
-  border-radius: .5rem;
+.talk-textarea {
+  background-color: #ffffff99;
+  border-radius: 0.5rem;
   color: black;
   outline: none;
-  padding: .2rem;
+  padding: 0.2rem;
   resize: none;
   width: 96%;
   height: 24%;
 }
 
-.talk-video-player{
+.talk-video-player {
   width: 75%;
   height: 75%;
   border-radius: 15px;
-  object-fit : cover;
+  object-fit: cover;
 }
-
 
 /* PROFILE CSS */
 
-.profile{
+.profile {
   width: 100%;
   height: 100vh;
   display: flex;
@@ -313,8 +320,8 @@ body {
   align-items: center;
 }
 
-.profile-content{
-  background-color: #FFFFFF99;
+.profile-content {
+  background-color: #ffffff99;
   height: 60%;
   width: 80%;
   margin: 20% 10% 10% 10%;
@@ -324,22 +331,22 @@ body {
   border-radius: 15px;
 }
 
-.profile-video-container{
+.profile-video-container {
   width: 12rem;
   height: 12rem;
   border-radius: 50%;
-  border: .7rem solid white;
+  border: 0.7rem solid white;
   position: absolute;
   top: -40%;
 }
 
-.profile-video-player{
+.profile-video-player {
   border-radius: inherit;
   width: inherit;
   height: inherit;
 }
 
-.profile-data{
+.profile-data {
   width: 100%;
   padding: 8% 5% 5% 5%;
 }
