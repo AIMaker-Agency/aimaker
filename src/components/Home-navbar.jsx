@@ -5,11 +5,15 @@ import Modal from "./Modal";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
 import MenuItem from "./MenuItem";
+import { MdOutlineMenu } from "react-icons/md";
+import { FaUser } from "react-icons/fa";
 
 function HomeNavBar() {
   const supabase = getSupabaseClient();
 
   const [session, setSession] = useState(null);
+  const [menuLoginVisible, setMenuLoginVisible] = useState(false);
+  const [menuItemsVisible, setMenuItemsVisible] = useState(false);
   const [modal, setModal] = useState({
     isShowing: false,
     title: "",
@@ -68,54 +72,155 @@ function HomeNavBar() {
   return (
     <div className="home-navbar">
       <div className="home-navbar-items">
-        {MenuItems &&
-          MenuItems.map((item, index) => (
-            <MenuItem key={"menu-item-" + index} item={item} />
-          ))}
-      </div>
-      <div className="home-navbar-login-btns">
-        {!session ? (
-          <>
-            <a
-              className="home-navbar-item"
-              onClick={(e) => {
-                e.preventDefault();
-                setModal({
-                  ...modal,
-                  title: "Sign in",
-                  isShowing: true,
-                  isSignIn: true,
-                });
-              }}
-            >
-              Sign In
-            </a>
-            <a
-              className="home-navbar-item"
-              onClick={(e) => {
-                e.preventDefault();
-                setModal({
-                  ...modal,
-                  title: "Sign up",
-                  isShowing: true,
-                  isSignIn: false,
-                });
-              }}
-            >
-              Sign Up
-            </a>
-          </>
+        {window.innerWidth <= 686 ? (
+          <div className="home-navbar-item">
+            <div className="home-navbar-dropdown">
+              <div
+                className="home-navbar-dropdown-title"
+                onClick={(e) => setMenuItemsVisible(!menuItemsVisible)}
+              >
+                <MdOutlineMenu />
+                <div>Menu</div>
+              </div>
+              {menuItemsVisible ? (
+                <div className="home-navbar-dropdown-menu">
+                  {MenuItems &&
+                    MenuItems.map((item, index) => (
+                      <MenuItem key={"menu-item-" + index} item={item} />
+                    ))}
+                </div>
+              ) : (
+                <></>
+              )}
+            </div>
+          </div>
         ) : (
           <>
-            <a
-              className="home-navbar-item"
-              onClick={(e) => {
-                e.preventDefault();
-                supabase.auth.signOut();
-              }}
-            >
-              Log out
-            </a>
+            {MenuItems &&
+              MenuItems.map((item, index) => (
+                <MenuItem key={"menu-item-" + index} item={item} />
+              ))}
+          </>
+        )}
+      </div>
+      <div className="home-navbar-login-btns">
+        {window.innerWidth <= 836 ? (
+          <div
+            className="home-navbar-item"
+            onClick={(e) => setMenuLoginVisible(!menuLoginVisible)}
+          >
+            <div className="home-navbar-dropdown">
+              <div className="home-navbar-dropdown-title">
+                <div>
+                  <FaUser />
+                </div>
+              </div>
+              {menuLoginVisible ? (
+                <>
+                  <ul className="home-navbar-dropdown-menu-icon">
+                    {!session ? (
+                      <>
+                        <li>
+                          <a
+                            className="home-navbar-item"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setModal({
+                                ...modal,
+                                title: "Sign in",
+                                isShowing: true,
+                                isSignIn: true,
+                              });
+                            }}
+                          >
+                            Sign In
+                          </a>
+                        </li>
+                        <li>
+                          <a
+                            className="home-navbar-item"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setModal({
+                                ...modal,
+                                title: "Sign up",
+                                isShowing: true,
+                                isSignIn: false,
+                              });
+                            }}
+                          >
+                            Sign Up
+                          </a>
+                        </li>
+                      </>
+                    ) : (
+                      <>
+                        <li>
+                          <a
+                            className="home-navbar-item"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              supabase.auth.signOut();
+                            }}
+                          >
+                            Log out
+                          </a>
+                        </li>
+                      </>
+                    )}
+                  </ul>
+                </>
+              ) : (
+                <></>
+              )}
+            </div>
+          </div>
+        ) : (
+          <>
+            {!session ? (
+              <>
+                <a
+                  className="home-navbar-item"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setModal({
+                      ...modal,
+                      title: "Sign in",
+                      isShowing: true,
+                      isSignIn: true,
+                    });
+                  }}
+                >
+                  Sign In
+                </a>
+                <a
+                  className="home-navbar-item"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setModal({
+                      ...modal,
+                      title: "Sign up",
+                      isShowing: true,
+                      isSignIn: false,
+                    });
+                  }}
+                >
+                  Sign Up
+                </a>
+              </>
+            ) : (
+              <>
+                <a
+                  className="home-navbar-item"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    supabase.auth.signOut();
+                  }}
+                >
+                  Log out
+                </a>
+              </>
+            )}
           </>
         )}
       </div>

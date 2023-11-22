@@ -58,6 +58,9 @@ function SignUp() {
         setButtonSignUp({ isDisable: false, text: "Sign Up" });
         setSendEmail(true);
       }
+    } else {
+      setError({ isError: true, message: error.message });
+      setButtonSignUp({ isDisable: false, text: "Sign Up" });
     }
   };
 
