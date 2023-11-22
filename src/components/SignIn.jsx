@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 const supabase = getSupabaseClient();
 
 function SignIn() {
-  
   const [user, setUser] = useState({
     email: "",
     password: "",
@@ -22,7 +21,6 @@ function SignIn() {
   };
 
   const validateData = () => {
-
     if (user.email === "") {
       setError({ isError: true, message: "Please, enter your e-mail" });
       return false;
@@ -44,6 +42,7 @@ function SignIn() {
 
     if (!error) {
       // navigate('/avatars')
+      setError({ isError: true, message: error.message });
     }
   };
 
@@ -73,8 +72,8 @@ function SignIn() {
           className="button-1"
           onClick={(e) => {
             e.preventDefault();
-            if(validateData()){
-                handleSignIn();
+            if (validateData()) {
+              handleSignIn();
             }
           }}
         >
