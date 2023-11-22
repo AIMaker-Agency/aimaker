@@ -40,7 +40,7 @@ function SignIn() {
       password: user.password,
     });
 
-    if (!error) {
+    if (error) {
       // navigate('/avatars')
       setError({ isError: true, message: error.message });
     }
@@ -56,6 +56,7 @@ function SignIn() {
           type="email"
           placeholder="E-mail"
           className="text-input"
+          onFocus={(e) => setError({ ...error, isError: false })}
           onChange={(e) => {
             setUser({ ...user, email: e.target.value });
           }}
@@ -64,6 +65,7 @@ function SignIn() {
           type="password"
           placeholder="Password"
           className="text-input"
+          onFocus={(e) => setError({ ...error, isError: false })}
           onChange={(e) => {
             setUser({ ...user, password: e.target.value });
           }}

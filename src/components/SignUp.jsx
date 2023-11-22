@@ -61,6 +61,9 @@ function SignUp() {
         setButtonSignUp({ isDisable: false, text: "Sign Up" });
         setError({ isError: true, message: error.message });
       }
+    } else {
+      setError({ isError: true, message: error.message });
+      setButtonSignUp({ isDisable: false, text: "Sign Up" });
     }
   };
 
