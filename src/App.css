@@ -56,13 +56,6 @@ body {
   display: flex;
 }
 
-/* @media (max-width: 635px) {
-  .home-navbar-items {
-    flex-direction: column;
-    position: relative;
-  }
-} */
-
 .home-navbar-login-btns {
   display: flex;
 }
@@ -194,6 +187,12 @@ body {
   padding: 1rem;
   display: flex;
   flex-direction: column;
+}
+
+@media (max-width: 635px) {
+  .modal-container {
+    width: 75%;
+  }
 }
 
 .modal-title-bar {
