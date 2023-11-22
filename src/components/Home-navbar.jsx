@@ -80,7 +80,7 @@ function HomeNavBar() {
                 onClick={(e) => setMenuItemsVisible(!menuItemsVisible)}
               >
                 <MdOutlineMenu />
-                <div>Menu</div>
+                <div> Menu</div>
               </div>
               {menuItemsVisible ? (
                 <div className="home-navbar-dropdown-menu">
