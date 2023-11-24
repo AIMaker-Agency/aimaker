@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
 import { getSupabaseClient } from "../models/supabase";
 import Modal from "./Modal";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
 import MenuItem from "./MenuItem";
-import { MdOutlineMenu } from "react-icons/md";
-import { FaUser } from "react-icons/fa";
+import styled from "styled-components";
 
 function HomeNavBar() {
   const supabase = getSupabaseClient();
@@ -69,158 +67,83 @@ function HomeNavBar() {
     return () => subscription.unsubscribe();
   }, []);
 
+  const handleVisibilityMenu = () => {
+    setMenuItemsVisible(!menuItemsVisible);
+  };
+
   return (
-    <div className="home-navbar">
-      <div className="home-navbar-items">
-        {window.innerWidth <= 686 ? (
-          <div className="home-navbar-item">
-            <div className="home-navbar-dropdown">
-              <div
-                className="home-navbar-dropdown-title"
-                onClick={(e) => setMenuItemsVisible(!menuItemsVisible)}
-              >
-                <MdOutlineMenu />
-                <div> Menu</div>
-              </div>
-              {menuItemsVisible ? (
-                <div className="home-navbar-dropdown-menu">
-                  {MenuItems &&
-                    MenuItems.map((item, index) => (
-                      <MenuItem key={"menu-item-" + index} item={item} />
-                    ))}
-                </div>
-              ) : (
-                <></>
-              )}
-            </div>
-          </div>
-        ) : (
-          <>
-            {MenuItems &&
-              MenuItems.map((item, index) => (
-                <MenuItem key={"menu-item-" + index} item={item} />
-              ))}
-          </>
-        )}
+    <NavBar>
+      <div className="home-navbar">
+        <div
+          className="button-burguer"
+          onClick={(e) => {
+            e.preventDefault();
+            setMenuItemsVisible(!menuItemsVisible);
+          }}
+        >
+          <input id="menu-toggle" type="checkbox" />
+          <label className="menu-button-container" htmlFor="menu-toggle">
+            <div className="menu-button"></div>
+          </label>
+        </div>
+        <div
+          className={`home-navbar-items ${menuItemsVisible ? "active" : ""}`}
+        >
+          {MenuItems &&
+            MenuItems.map((item, index) => (
+              <MenuItem
+                key={"menu-item-" + index}
+                onClick={handleVisibilityMenu}
+                item={item}
+              />
+            ))}
+        </div>
       </div>
       <div className="home-navbar-login-btns">
-        {window.innerWidth <= 836 ? (
-          <div
-            className="home-navbar-item"
-            onClick={(e) => setMenuLoginVisible(!menuLoginVisible)}
-          >
-            <div className="home-navbar-dropdown">
-              <div className="home-navbar-dropdown-title">
-                <div>
-                  <FaUser />
-                </div>
-              </div>
-              {menuLoginVisible ? (
-                <>
-                  <ul className="home-navbar-dropdown-menu-icon">
-                    {!session ? (
-                      <>
-                        <li>
-                          <a
-                            className="home-navbar-item"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              setModal({
-                                ...modal,
-                                title: "Sign in",
-                                isShowing: true,
-                                isSignIn: true,
-                              });
-                            }}
-                          >
-                            Sign In
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            className="home-navbar-item"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              setModal({
-                                ...modal,
-                                title: "Sign up",
-                                isShowing: true,
-                                isSignIn: false,
-                              });
-                            }}
-                          >
-                            Sign Up
-                          </a>
-                        </li>
-                      </>
-                    ) : (
-                      <>
-                        <li>
-                          <a
-                            className="home-navbar-item"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              supabase.auth.signOut();
-                            }}
-                          >
-                            Log out
-                          </a>
-                        </li>
-                      </>
-                    )}
-                  </ul>
-                </>
-              ) : (
-                <></>
-              )}
-            </div>
-          </div>
+        {!session ? (
+          <>
+            <a
+              className="home-navbar-item"
+              onClick={(e) => {
+                e.preventDefault();
+                setModal({
+                  ...modal,
+                  title: "Sign in",
+                  isShowing: true,
+                  isSignIn: true,
+                });
+              }}
+            >
+              Sign In
+            </a>
+            <a
+              className="home-navbar-item"
+              onClick={(e) => {
+                e.preventDefault();
+                setModal({
+                  ...modal,
+                  title: "Sign up",
+                  isShowing: true,
+                  isSignIn: false,
+                });
+              }}
+            >
+              Sign Up
+            </a>
+          </>
         ) : (
           <>
-            {!session ? (
-              <>
-                <a
-                  className="home-navbar-item"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setModal({
-                      ...modal,
-                      title: "Sign in",
-                      isShowing: true,
-                      isSignIn: true,
-                    });
-                  }}
-                >
-                  Sign In
-                </a>
-                <a
-                  className="home-navbar-item"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setModal({
-                      ...modal,
-                      title: "Sign up",
-                      isShowing: true,
-                      isSignIn: false,
-                    });
-                  }}
-                >
-                  Sign Up
-                </a>
-              </>
-            ) : (
-              <>
-                <a
-                  className="home-navbar-item"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    supabase.auth.signOut();
-                  }}
-                >
-                  Log out
-                </a>
-              </>
-            )}
+            <li>
+              <a
+                className="home-navbar-item"
+                onClick={(e) => {
+                  e.preventDefault();
+                  supabase.auth.signOut();
+                }}
+              >
+                Log out
+              </a>
+            </li>
           </>
         )}
       </div>
@@ -236,8 +159,117 @@ function HomeNavBar() {
       ) : (
         <></>
       )}
-    </div>
+    </NavBar>
   );
 }
 
 export default HomeNavBar;
+
+const NavBar = styled.nav`
+  background-color: #eeeeee;
+  width: 80%;
+  padding: 0px 2rem;
+  box-sizing: border-box;
+  margin: 1rem 0px;
+  border-radius: 15px;
+  display: flex;
+  justify-content: space-between;
+
+  .home-navbar,
+  .home-navbar-login-btns {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    position: relative;
+
+    .home-navbar-items {
+      display: flex;
+
+      @media (max-width: 768px) {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 3rem;
+        background-color: #eee;
+        &.active {
+          display: flex;
+        }
+      }
+    }
+
+    .button-burguer {
+      @media (min-width: 768px) {
+        display: none;
+      }
+    }
+
+    .home-navbar-item {
+      @media (min-width: 768px) {
+        width: max-content;
+      }
+    }
+
+    .home-navbar-item,
+    .button-burguer {
+      padding: 1rem;
+      text-decoration: none;
+      font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
+        sans-serif;
+      color: #222222;
+      font-weight: bold;
+      background-color: #eee;
+
+      .home-navbar-dropdown-title {
+        display: flex;
+        column-gap: 2px;
+
+        .home-navbar-dropdown-icon {
+          margin-top: 2px;
+
+          @media (max-width: 768px) {
+            transform: rotate(-90deg);
+            margin-top: 0px;
+          }
+        }
+      }
+
+      .home-navbar-dropdown {
+        position: relative;
+      }
+
+      .home-navbar-dropdown-menu {
+        position: absolute;
+      }
+
+      @media (max-width: 768px) {
+        .home-navbar-dropdown-menu {
+          left: 5.4rem;
+          top: 1px;
+        }
+      }
+
+      @media (min-width: 768px) {
+        .home-navbar-dropdown-menu {
+          left: -1rem;
+          top: 3.35rem;
+        }
+      }
+    }
+
+    .home-navbar-item:hover,
+    .button-burguer:hover {
+      background-color: #22222266;
+      cursor: pointer;
+    }
+  }
+
+  .home-navbar-login-btns {
+    @media (max-width: 768px) {
+      flex: 5;
+    }
+  }
+
+  .home-navbar-login-btns {
+    justify-content: flex-end;
+  }
+`;

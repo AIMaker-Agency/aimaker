@@ -36,77 +36,60 @@ body {
   background-color: white;
   width: 80%;
   padding: 2rem;
+  overflow: auto;
+  box-sizing: border-box;
   border-radius: 1rem;
   height: calc(100vh - 10rem);
   font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
   font-size: large;
 }
 
-.home-navbar {
-  background-color: #eeeeee;
-  width: 80%;
-  padding: 0px 2rem;
-  margin: 1rem 0px;
-  border-radius: 15px;
-  display: flex;
-  justify-content: space-between;
+.button-burguer #menu-toggle {
+  display: none;
 }
 
-.home-navbar-items {
-  display: flex;
-}
-
-.home-navbar-login-btns {
-  display: flex;
-}
-
-.home-navbar-item {
-  padding: 1rem;
-  text-decoration: none;
-  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
-  color: #222222;
-  font-weight: bold;
+.button-burguer .menu-button,
+.button-burguer .menu-button::before,
+.button-burguer .menu-button::after {
   display: block;
-  width: max-content;
-}
-
-.home-navbar-item:hover {
-  background-color: #22222266;
-  cursor: pointer;
-}
-
-.home-navbar-dropdown {
-  display: flex;
-  flex-direction: column;
+  background-color: black;
   position: relative;
+  height: 2px;
+  width: 1rem;
+  transition: transform 400ms cubic-bezier(0.23, 1, 0.32, 1);
+  border-radius: 2px;
 }
 
-.home-navbar-dropdown-title {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.home-navbar-dropdown-icon {
-  margin-left: 1rem;
-}
-
-.home-navbar-dropdown-menu {
-  display: block;
+.button-burguer .menu-button::before {
+  content: "";
+  margin-top: -4px;
   position: absolute;
-  top: 2rem;
-  left: -1rem;
-  background-color: #eeeeee;
-  list-style: none;
 }
 
-.home-navbar-dropdown-menu-icon {
-  display: block;
+.button-burguer .menu-button::after {
+  content: "";
+  margin-top: 4px;
   position: absolute;
-  top: 2rem;
-  left: -4rem;
-  background-color: #eeeeee;
-  list-style: none;
+}
+
+.button-burguer
+  #menu-toggle:checked
+  + .menu-button-container
+  .menu-button::before {
+  margin-top: 0px;
+  transform: rotate(405deg);
+}
+
+.button-burguer #menu-toggle:checked + .menu-button-container .menu-button {
+  background: rgba(255, 255, 255, 0);
+}
+
+.button-burguer
+  #menu-toggle:checked
+  + .menu-button-container
+  .menu-button::after {
+  margin-top: 0px;
+  transform: rotate(-405deg);
 }
 
 /* INPUTS AND BUTTONS CSS */
@@ -220,6 +203,18 @@ body {
 
 /* AVATARS CSS */
 
+@media (max-width: 768px) {
+  .talk-container {
+    height: 80%;
+  }
+}
+
+@media (min-width: 768px) {
+  .talk-result-container {
+    width: 100%;
+  }
+}
+
 .talk-container {
   display: flex;
   width: 80%;
@@ -255,7 +250,6 @@ body {
 
 .talk-result-container {
   flex-grow: 1;
-  width: 100%;
   padding: 2rem;
   display: flex;
   flex-direction: column;
