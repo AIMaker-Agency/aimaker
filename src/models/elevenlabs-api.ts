@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_KEY: string = "b288f4acde97a03c92159929bdad79bc";
+const API_KEY: string = process.env.ELEVENLABS_API_KEY ?? "";
 const API_ADD_VOICE: string = "https://api.elevenlabs.io/v1/voices/add";
 const API_TEXT_TO_SPEECH: string =
   "https://api.elevenlabs.io/v1/text-to-speech/";

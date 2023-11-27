@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_KEY: string = "cGhpbHBAYWltYWtlci5mcg:HW3gdkfB9n6KFrYz2b7wL";
+const API_KEY: string = process.env.D_ID_API_KEY ?? "";
 const API_TALK_URL: string = "https://api.d-id.com/talks";
 
 interface DIdResponse {
@@ -86,15 +86,19 @@ export async function getTalkVideo(talkId: string): Promise<DIdResponse> {
 
       if (response.data.status === "done") {
         // Fetch the result when done
-        const res = await fetch(response.data.result_url);
-        const blobFile = await res.blob();
-        let videoFile = new File([blobFile], "video_profile.mp4", {
-          type: "video/mp4",
-        });
+        try {
+          const res = await fetch(response.data.result_url, { mode: "cors" });
+          const blobFile = await res.blob();
+          let videoFile = new File([blobFile], "video_profile.mp4", {
+            type: "video/mp4",
+          });
 
-        responseTalk.data = { file: videoFile };
-        responseTalk.error = undefined;
-        return responseTalk;
+          responseTalk = { data: { file: videoFile }, error: undefined };
+          return responseTalk;
+        } catch (error) {
+          responseTalk = { data: undefined, error: error };
+          return responseTalk;
+        }
       } else {
         // Wait for 2 seconds before trying again
         await new Promise((resolve) => setTimeout(resolve, 2000));
