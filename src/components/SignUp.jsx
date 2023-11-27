@@ -5,6 +5,7 @@ import {
   getSupabaseClient,
 } from "../models/supabase";
 import { Auth } from "@supabase/auth-ui-react";
+import InputPassword from "./InputPassword";
 
 // const supabase = getSupabaseClient();
 const supabase = getSupabaseAdmin();
@@ -191,36 +192,36 @@ function SignUp() {
                 width: "calc(100% + 0.6rem)",
               }}
             >
-              <input
-                style={{ marginRight: "5px" }}
-                type="password"
-                placeholder="Password"
-                className="text-input"
-                onFocus={(e) => {
-                  handleFocus();
-                }}
-                onChange={(e) => {
-                  setUser({
-                    ...user,
-                    password: e.target.value,
-                  });
-                }}
-              ></input>
-              <input
-                style={{ marginLeft: "5px" }}
-                type="password"
-                placeholder="Confirm password"
-                className="text-input"
-                onFocus={(e) => {
-                  handleFocus();
-                }}
-                onChange={(e) => {
-                  setUser({
-                    ...user,
-                    confirmPassword: e.target.value,
-                  });
-                }}
-              ></input>
+              <div style={{ marginRight: "5px" }}>
+                <InputPassword
+                  placeholder={"Password"}
+                  className={"text-input"}
+                  onChange={(e) => {
+                    setUser({
+                      ...user,
+                      password: e.target.value,
+                    });
+                  }}
+                  onFocus={(e) => {
+                    handleFocus();
+                  }}
+                />
+              </div>
+              <div style={{ marginLeft: "5px" }}>
+                <InputPassword
+                  placeholder={"Confirm password"}
+                  className={"text-input"}
+                  onChange={(e) => {
+                    setUser({
+                      ...user,
+                      confirmPassword: e.target.value,
+                    });
+                  }}
+                  onFocus={(e) => {
+                    handleFocus();
+                  }}
+                />
+              </div>
             </div>
             <button
               className="button-1"

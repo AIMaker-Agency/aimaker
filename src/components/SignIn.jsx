@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getSupabaseClient } from "../models/supabase";
 import { Auth } from "@supabase/auth-ui-react";
 import { useNavigate } from "react-router-dom";
+import InputPassword from "./InputPassword";
 
 const supabase = getSupabaseClient();
 
@@ -61,15 +62,14 @@ function SignIn() {
             setUser({ ...user, email: e.target.value });
           }}
         ></input>
-        <input
-          type="password"
-          placeholder="Password"
-          className="text-input"
-          onFocus={(e) => setError({ ...error, isError: false })}
+        <InputPassword
+          placeholder={"Password"}
+          className={"text-input"}
           onChange={(e) => {
             setUser({ ...user, password: e.target.value });
           }}
-        ></input>
+          onFocus={(e) => setError({ ...error, isError: false })}
+        />
         <button
           className="button-1"
           onClick={(e) => {
