@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_KEY: string = process.env.ELEVENLABS_API_KEY ?? "";
+const API_KEY: string = import.meta.env.VITE_ELEVENLABS_API_KEY ?? "";
 const API_ADD_VOICE: string = "https://api.elevenlabs.io/v1/voices/add";
 const API_TEXT_TO_SPEECH: string =
   "https://api.elevenlabs.io/v1/text-to-speech/";
@@ -37,7 +37,7 @@ export async function addVoice(
     });
 
     responseVoice.data = { voiceId: response.data.voice_id };
-  } catch (error) {
+  } catch (error: any) {
     responseVoice.error = { message: error.response.data.detail.message };
   }
 
@@ -80,7 +80,7 @@ export async function textToSpeech(
     });
 
     responseTextToSpeech.data = { file: audioFile };
-  } catch (error) {
+  } catch (error: any) {
     responseTextToSpeech.error = error;
   }
 

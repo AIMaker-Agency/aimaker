@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_KEY: string = process.env.D_ID_API_KEY ?? "";
+const API_KEY: string = import.meta.env.VITE_D_ID_API_KEY;
 const API_TALK_URL: string = "https://api.d-id.com/talks";
 
 interface DIdResponse {
@@ -63,7 +63,7 @@ export async function createTalk(
 
     const talkId = response.data.id;
     responseTalk.data = { talkId: talkId, status: response.data.status };
-  } catch (error) {
+  } catch (error: any) {
     responseTalk.error = { message: error.response.data.description };
   }
 
@@ -95,7 +95,7 @@ export async function getTalkVideo(talkId: string): Promise<DIdResponse> {
 
           responseTalk = { data: { file: videoFile }, error: undefined };
           return responseTalk;
-        } catch (error) {
+        } catch (error: any) {
           responseTalk = { data: undefined, error: error };
           return responseTalk;
         }
@@ -104,7 +104,7 @@ export async function getTalkVideo(talkId: string): Promise<DIdResponse> {
         await new Promise((resolve) => setTimeout(resolve, 2000));
         return checkStatus();
       }
-    } catch (err) {
+    } catch (err: any) {
       responseTalk.error = { message: err.response.data.description };
       return responseTalk;
     }

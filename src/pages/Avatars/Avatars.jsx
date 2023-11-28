@@ -160,6 +160,36 @@ function Avatars() {
       setSourceData({ ...sourceData, video: null });
       setBtnCreate({ ...btnCreate, disabled: true, text: "Loading..." });
 
+      const getTalkVideoResponse = await getTalkVideo(
+        "tlk_oH2aF4giOYsZvSLeoV6f0"
+      );
+
+      if (!getTalkVideoResponse.error) {
+        const { data: uploadVideo, error: errorUploadVideo } =
+          await supabase.storage
+            .from(bucket_d_id_videos)
+            .upload(fileNames + ".mp4", getTalkVideoResponse.data.file, {
+              cacheControl: 3600,
+              upsert: true,
+            });
+
+        if (!errorUploadVideo) {
+          console.log("entró aquí");
+          const urlVideo = supabase.storage
+            .from(bucket_d_id_videos)
+            .getPublicUrl(fileNames + ".mp4");
+
+          setSourceData({ ...sourceData, video: urlVideo.data.publicUrl });
+        }
+      } else {
+        setError({
+          isError: true,
+          message: getTalkVideoResponse.error.message,
+        });
+        setBtnCreate({ disabled: false, text: "Create video" });
+      }
+
+      return;
       const addVoiceResponse = await addVoice(
         "voice" + (user != null ? user.id : fileNames),
         "Cloned voice of user in " +
