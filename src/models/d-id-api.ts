@@ -87,13 +87,21 @@ export async function getTalkVideo(talkId: string): Promise<DIdResponse> {
       if (response.data.status === "done") {
         // Fetch the result when done
         try {
-          const res = await fetch(response.data.result_url, { mode: "cors" });
+          const res = await fetch(
+            response.data.result_url.replace(
+              "https://d-id-talks-prod.s3.us-west-2.amazonaws.com",
+              "/api"
+            )
+          );
           const blobFile = await res.blob();
           let videoFile = new File([blobFile], "video_profile.mp4", {
             type: "video/mp4",
           });
 
-          responseTalk = { data: { file: videoFile }, error: undefined };
+          responseTalk = {
+            data: { file: videoFile, result_url: response.data.result_url },
+            error: undefined,
+          };
           return responseTalk;
         } catch (error: any) {
           responseTalk = { data: undefined, error: error };

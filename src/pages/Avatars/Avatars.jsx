@@ -9,7 +9,11 @@ import {
   bucket_user_audios,
 } from "../../models/supabase-constants";
 import { createTalk, getTalkVideo } from "../../models/d-id-api.ts";
-import { addVoice, textToSpeech } from "../../models/elevenlabs-api.ts";
+import {
+  addVoice,
+  textToSpeech,
+  deleteVoice,
+} from "../../models/elevenlabs-api.ts";
 import styled from "styled-components";
 
 const supabase = getSupabaseClient();
@@ -40,6 +44,7 @@ function Avatars() {
     video: null,
     photo: null,
   });
+  const [lastVoice, setLastVoice] = useState(null);
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -68,28 +73,26 @@ function Avatars() {
     if (user) {
       setFilenames(user.id);
       const fetchUserData = async () => {
-        const { data: dataImage } = supabase.storage
-          .from(bucket_d_id_pictures)
-          .getPublicUrl(user.id + ".jpg");
-        const { data: dataAudio } = supabase.storage
-          .from(bucket_user_audios)
-          .getPublicUrl(user.id + ".m4a");
+        const { data: pictureList, error: errorPictureList } =
+          await supabase.storage
+            .from(bucket_d_id_pictures)
+            .list("", { search: user.id });
+        const { data: audioList, error: errorAudioList } =
+          await supabase.storage
+            .from(bucket_user_audios)
+            .list("", { search: user.id });
 
-        const { data: dataAux1, error: errorAux1 } = await supabase.storage
-          .from(bucket_d_id_pictures)
-          .list("", { search: user.id + ".jpg" });
-        const { data: dataAux2, error: errorAux2 } = await supabase.storage
-          .from(bucket_user_audios)
-          .list("", { search: user.id + ".m4a" });
-
-        if (dataAux1 && dataAux1.length != 0 && !errorAux1) {
-          setSourceData({
-            ...sourceData,
-            photo: dataImage.publicUrl,
-          });
+        if (pictureList && pictureList.length != 0 && !errorPictureList) {
+          const { data: dataImage } = supabase.storage
+            .from(bucket_d_id_pictures)
+            .getPublicUrl(pictureList[0].name);
+          setSourceData({ ...sourceData, photo: dataImage.publicUrl });
         }
 
-        if (dataAux2 && dataAux2.length != 0 && !errorAux2) {
+        if (audioList && audioList.length != 0 && !errorAudioList) {
+          const { data: dataAudio } = supabase.storage
+            .from(bucket_user_audios)
+            .getPublicUrl(audioList[0].name);
           setSourceData({
             ...sourceData,
             audio: dataAudio.publicUrl,
@@ -160,36 +163,36 @@ function Avatars() {
       setSourceData({ ...sourceData, video: null });
       setBtnCreate({ ...btnCreate, disabled: true, text: "Loading..." });
 
-      const getTalkVideoResponse = await getTalkVideo(
-        "tlk_oH2aF4giOYsZvSLeoV6f0"
-      );
+      // const getTalkVideoResponse = await getTalkVideo(
+      //   "tlk_cUA06cOZXkm5B0-pcMWON"
+      // );
 
-      if (!getTalkVideoResponse.error) {
-        const { data: uploadVideo, error: errorUploadVideo } =
-          await supabase.storage
-            .from(bucket_d_id_videos)
-            .upload(fileNames + ".mp4", getTalkVideoResponse.data.file, {
-              cacheControl: 3600,
-              upsert: true,
-            });
+      // if (!getTalkVideoResponse.error) {
+      //   const { data: uploadVideo, error: errorUploadVideo } =
+      //     await supabase.storage
+      //       .from(bucket_d_id_videos)
+      //       .upload(fileNames + ".mp4", getTalkVideoResponse.data.file, {
+      //         cacheControl: 3600,
+      //         upsert: true,
+      //       });
 
-        if (!errorUploadVideo) {
-          console.log("entró aquí");
-          const urlVideo = supabase.storage
-            .from(bucket_d_id_videos)
-            .getPublicUrl(fileNames + ".mp4");
+      //   if (!errorUploadVideo) {
+      //     console.log("entró aquí");
+      //     const urlVideo = supabase.storage
+      //       .from(bucket_d_id_videos)
+      //       .getPublicUrl(fileNames + ".mp4");
 
-          setSourceData({ ...sourceData, video: urlVideo.data.publicUrl });
-        }
-      } else {
-        setError({
-          isError: true,
-          message: getTalkVideoResponse.error.message,
-        });
-        setBtnCreate({ disabled: false, text: "Create video" });
-      }
+      //     setSourceData({ ...sourceData, video: urlVideo.data.publicUrl });
+      //   }
+      // } else {
+      //   setError({
+      //     isError: true,
+      //     message: getTalkVideoResponse.error.message,
+      //   });
+      //   setBtnCreate({ disabled: false, text: "Create video" });
+      // }
 
-      return;
+      // return;
       const addVoiceResponse = await addVoice(
         "voice" + (user != null ? user.id : fileNames),
         "Cloned voice of user in " +
@@ -203,6 +206,9 @@ function Avatars() {
         setBtnCreate({ disabled: false, text: "Create video" });
         return;
       }
+
+      changeVoiceId(user.id, lastVoice, addVoiceResponse.data.voiceId);
+      setLastVoice(addVoiceResponse.data.voiceId);
 
       const textToSpeechResponse = await textToSpeech(
         talkText,
@@ -249,18 +255,28 @@ function Avatars() {
           const { data: uploadVideo, error: errorUploadVideo } =
             await supabase.storage
               .from(bucket_d_id_videos)
-              .upload(fileNames + ".mp4", getTalkVideoResponse.data.file, {
-                cacheControl: 3600,
-                upsert: true,
-              });
+              .upload(
+                fileNames + "/" + fileNames + ".mp4",
+                getTalkVideoResponse.data.file,
+                {
+                  cacheControl: 3600,
+                  upsert: true,
+                }
+              );
 
           if (!errorUploadVideo) {
-            console.log("entró aquí");
             const urlVideo = supabase.storage
               .from(bucket_d_id_videos)
-              .getPublicUrl(fileNames + ".mp4");
+              .getPublicUrl(fileNames + "/" + fileNames + ".mp4");
 
-            setSourceData({ ...sourceData, video: urlVideo.data.publicUrl });
+            setSourceData({
+              ...sourceData,
+              video: getTalkVideoResponse.data.result_url,
+            });
+            let ipSaved = await saveIP(user.id, createTalkResponse.data.talkId);
+            if (ipSaved && !user.id) {
+              deleteFiles(fileNames);
+            }
           }
         } else {
           setError({
@@ -470,63 +486,14 @@ function Avatars() {
                 alignItems: "center",
               }}
             >
-              {sourceData.photo || !user ? (
-                <label htmlFor="image">
-                  <input
-                    type="file"
-                    name="image"
-                    id="image"
-                    accept="image/*"
-                    onChange={async (e) => {
-                      if (e.target.files.length > 0) {
-                        const { error: uploadPhotoError } =
-                          await supabase.storage
-                            .from(bucket_d_id_pictures)
-                            .upload(
-                              "./" +
-                                fileNames +
-                                getFileExtension(e.target.files[0].name),
-                              e.target.files[0],
-                              {
-                                cacheControl: "3600",
-                                upsert: true,
-                              }
-                            );
-
-                        if (!uploadPhotoError) {
-                          const { data } = supabase.storage
-                            .from(bucket_d_id_pictures)
-                            .getPublicUrl(
-                              fileNames +
-                                getFileExtension(e.target.files[0].name)
-                            );
-
-                          setSourceData({
-                            ...sourceData,
-                            photo: data.publicUrl,
-                          });
-                        }
-                      }
-                    }}
-                    hidden
-                  />
-                  <div className="talk-picture-container">
-                    {sourceData.photo ? (
-                      <img className="talk-picture" src={sourceData.photo} />
-                    ) : (
-                      "Upload photo"
-                    )}
-                  </div>
-                </label>
-              ) : (
-                <div className="talk-picture-container">
-                  {sourceData.photo ? (
-                    <img className="talk-picture" src={sourceData.photo} />
-                  ) : (
-                    "No photo uploaded"
-                  )}
-                </div>
-              )}
+              <div className="talk-picture-container">
+                {console.log(sourceData)}
+                {sourceData.photo ? (
+                  <img className="talk-picture" src={sourceData.photo} />
+                ) : (
+                  "Upload photo"
+                )}
+              </div>
               <label htmlFor="image">
                 <input
                   type="file"
@@ -701,6 +668,11 @@ async function saveIP(user, talkId) {
   const { error: err } = await supabase
     .from("d_id_talks")
     .insert({ talkId: talkId, userId: user ? user.id : null, ip: ip });
+  if (err) {
+    return false;
+  } else {
+    return true;
+  }
 }
 
 async function checkIp() {
@@ -733,18 +705,10 @@ async function getVoiceId(userId) {
   return Array.isArray(data) && data[0] ? data[0].voiceId : "";
 }
 
-async function changeVoiceId(userId, newVoiceId) {
-  const lastVoiceId = await getVoiceId(userId);
-  if (lastVoiceId != "") {
-    const response = await axios.delete(
-      "https://api.elevenlabs.io/v1/voices/" + lastVoiceId,
-      {
-        headers: {
-          accept: "application/json",
-          "xi-api-key": "b288f4acde97a03c92159929bdad79bc",
-        },
-      }
-    );
+async function changeVoiceId(userId, lastVoice, newVoiceId) {
+  const lastVoiceId = lastVoice;
+  if (lastVoiceId != "" && lastVoice != null) {
+    await deleteVoice(lastVoiceId);
 
     const { data, error } = await supabase
       .from("d_id_voices")
