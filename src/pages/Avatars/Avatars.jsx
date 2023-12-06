@@ -8,7 +8,11 @@ import {
   bucket_d_id_videos,
   bucket_user_audios,
 } from "../../models/supabase-constants";
-import { createTalk, getTalkVideo } from "../../models/d-id-api.ts";
+import {
+  createTalk,
+  getTalkVideo,
+  getVideoFile,
+} from "../../models/d-id-api.ts";
 import {
   addVoice,
   textToSpeech,
@@ -29,6 +33,7 @@ function Avatars() {
     disabled: false,
     text: "Create video",
   });
+  const [videoSetted, setVideoSetted] = useState(false);
   const [fileNames, setFilenames] = useState(
     (Math.random() * 10).toString(36).replace(".", "")
   );
@@ -41,7 +46,8 @@ function Avatars() {
   const [user, setUser] = useState(null);
   const [sourceData, setSourceData] = useState({
     audio: null,
-    video: null,
+    video:
+      "https://d-id-talks-prod.s3.us-west-2.amazonaws.com/auth0%7C654a4feb41d204246e752bd6/tlk_Aw8UuG7-KJkB9HOMz5Seo/1701811481691.mp4?AWSAccessKeyId=AKIA5CUMPJBIK65W6FGA&Expires=1701897916&Signature=IPXaV2Oyv9N2b%2BHom2hhidvru%2F0%3D&X-Amzn-Trace-Id=Root%3D1-656f953c-5d122d841f5824f3041b6ea9%3BParent%3D9cc98d37d4da0196%3BSampled%3D1%3BLineage%3D6b931dd4%3A0",
     photo: null,
   });
   const [lastVoice, setLastVoice] = useState(null);
@@ -256,7 +262,7 @@ function Avatars() {
             await supabase.storage
               .from(bucket_d_id_videos)
               .upload(
-                fileNames + "/" + fileNames + ".mp4",
+                fileNames + "/video_" + createTalkResponse.data.talkId + ".mp4",
                 getTalkVideoResponse.data.file,
                 {
                   cacheControl: 3600,
@@ -267,16 +273,20 @@ function Avatars() {
           if (!errorUploadVideo) {
             const urlVideo = supabase.storage
               .from(bucket_d_id_videos)
-              .getPublicUrl(fileNames + "/" + fileNames + ".mp4");
+              .getPublicUrl(
+                fileNames + "/video_" + createTalkResponse.data.talkId + ".mp4"
+              );
 
             setSourceData({
               ...sourceData,
               video: getTalkVideoResponse.data.result_url,
             });
+
             let ipSaved = await saveIP(user.id, createTalkResponse.data.talkId);
-            if (ipSaved && !user.id) {
+            if (ipSaved && !user) {
               deleteFiles(fileNames);
             }
+            deleteVoice(lastVoice);
           }
         } else {
           setError({
@@ -285,192 +295,38 @@ function Avatars() {
           });
           setBtnCreate({ disabled: false, text: "Create video" });
         }
+      } else {
+        setError({
+          isError: true,
+          message: errorUploadAudio.message,
+        });
       }
-
-      /*
-      // var audioBlob = await axios.get(sourceData.audio, {
-      //   responseType: "blob",
-      // });
-      // var audioFile = new File([audioBlob.data], "audiofile.m4a");
-
-      // var elevenLabsBody = new FormData();
-      // elevenLabsBody.append("name", "voice" + user.id);
-      // elevenLabsBody.append("description", "User " + user.id + " voice");
-      // elevenLabsBody.append("files", audioFile);
-
-      // axios
-      //   .post("https://api.elevenlabs.io/v1/voices/add", elevenLabsBody, {
-      //     headers: {
-      //       accept: "application/json",
-      //       "xi-api-key": "b288f4acde97a03c92159929bdad79bc",
-      //       "Content-Type": "multipart/form-data",
-      //     },
-      //   })
-      //   .then((response) => {
-      //     changeVoiceId(user.id, response.data.voice_id);
-      //     setVoiceData({
-      //       ...voiceData,
-      //       hasAudioChange: true,
-      //       lastVoiceId: voiceData.voiceId,
-      //       voiceId: response.data.voice_id,
-      //     });
-
-      //     const textToSpeechBody = {
-      //       text: talkText,
-      //       model_id: "eleven_multilingual_v2",
-      //       voice_settings: {
-      //         stability: 0.5,
-      //         similarity_boost: 0.5,
-      //       },
-      //     };
-
-      //     const textToSpeechUrl =
-      //       "https://api.elevenlabs.io/v1/text-to-speech/" +
-      //       response.data.voice_id +
-      //       "/stream";
-
-      //     const textToSpeechConfig = {
-      //       headers: {
-      //         "xi-api-key": "b288f4acde97a03c92159929bdad79bc",
-      //         "Content-Type": "application/json",
-      //         Accept: "audio/mpeg",
-      //       },
-      //       responseType: "blob",
-      //     };
-
-      //     axios
-      //       .post(
-      //         textToSpeechUrl,
-      //         JSON.stringify(textToSpeechBody),
-      //         textToSpeechConfig
-      //       )
-      //       .then(async (responseToSpeech) => {
-      //         const audioFile = new File([responseToSpeech.data], "audio.mp3", {
-      //           type: "audio/mpeg",
-      //         });
-      //         const { data, error } = await supabase.storage
-      //           .from(bucket_d_id_audios)
-      //           .upload(
-      //             fileNames + "/audio_" + response.data.voice_id + ".mp3",
-      //             audioFile,
-      //             {
-      //               cacheControl: "3600",
-      //               upsert: true,
-      //             }
-      //           );
-
-      //         if (!error) {
-      //           const { data } = supabase.storage
-      //             .from(bucket_d_id_audios)
-      //             .getPublicUrl(
-      //               fileNames + "/audio_" + response.data.voice_id + ".mp3"
-      //             );
-
-      //           const d_id_body = {
-      //             script: {
-      //               type: "audio",
-      //               subtitles: "false",
-      //               ssml: "false",
-      //               audio_url: data.publicUrl,
-      //             },
-      //             config: { fluent: "false", pad_audio: "0.0" },
-      //             source_url: sourceData.photo,
-      //           };
-
-      //           axios
-      //             .post(
-      //               "https://api.d-id.com/talks",
-      //               JSON.stringify(d_id_body),
-      //               {
-      //                 headers: {
-      //                   accept: "application/json",
-      //                   "content-type": "application/json",
-      //                   authorization:
-      //                     "Basic d2ViLm9wZW4ubWFya2V0LnBsYWNlQGdtYWlsLmNvbQ:EtCj5kXjsHnxhDWszI68f",
-      //                 },
-      //               }
-      //             )
-      //             .then((response) => {
-      //               const talkId = response.data.id;
-
-      //               const interval = setInterval(() => {
-      //                 // "https://cors-anywhere.herokuapp.com/"+
-      //                 axios
-      //                   .get("https://api.d-id.com/talks/" + talkId, {
-      //                     headers: {
-      //                       accept: "application/json",
-      //                       "content-type": "application/json",
-      //                       authorization:
-      //                         "Basic d2ViLm9wZW4ubWFya2V0LnBsYWNlQGdtYWlsLmNvbQ:EtCj5kXjsHnxhDWszI68f",
-      //                     },
-      //                   })
-      //                   .then((response) => {
-      //                     if (response.data.status === "done") {
-      //                       /////////////// VALIDATE THE VIDEO UPLOAD TO DATABASE
-      //                       fetch(response.data.result_url, { mode: "no-cors" })
-      //                         .then((res) => res.blob())
-      //                         .then((blobFile) => {
-      //                           let videoFile = new File(
-      //                             [blobFile],
-      //                             "video_profile.mp4",
-      //                             {
-      //                               type: "video/mp4",
-      //                             }
-      //                           );
-      //                           const { error: videoError } = supabase.storage
-      //                             .from(bucket_d_id_videos)
-      //                             .upload(
-      //                               fileNames + "/video_profile_" + talkId,
-      //                               videoFile,
-      //                               {
-      //                                 cacheControl: "3600",
-      //                                 upsert: true,
-      //                               }
-      //                             );
-
-      //                           if (!videoError) {
-      //                             saveIP(user, talkId);
-      //                             if (!user) {
-      //                               setCanCreateVideo(false);
-      //                               deleteFiles(fileNames);
-      //                             }
-      //                             setBtnCreate({
-      //                               ...btnCreate,
-      //                               disabled: false,
-      //                               text: "Create video",
-      //                             });
-      //                             setSourceData({
-      //                               ...sourceData,
-      //                               video:
-      //                                 response.data.result_url +
-      //                                 "?_=" +
-      //                                 new Date().getTime(),
-      //                             });
-      //                             // clearInterval(interval);
-      //                           }
-      //                         })
-      //                         .catch((err) => console.error(err));
-      //                       clearInterval(interval);
-      //                     }
-      //                   })
-      //                   .catch((err) => {
-      //                     console.log(err);
-      //                     clearInterval(interval);
-      //                   });
-      //               }, 2000); // Poll every 5 seconds
-      //             })
-      //             .catch((error) => console.error(error));
-      //         }
-      //       });
-      //   })
-      //   .catch((err) => {
-      //     console.log(err);
-      //   });
-      */
     } else if (!canCreateVideo) {
       alert("Ya has excedido el uso de la demo, registrate para utilizar");
     }
     setBtnCreate({ ...btnCreate, disabled: false, text: "Create video" });
+  };
+
+  const handleSetVideoProfile = async () => {
+    console.log("Entra aquí");
+    const video = await getVideoFile(sourceData.video);
+
+    const { data: uploadVideoProfile, error: errorUploadVideoProfile } =
+      await supabase.storage
+        .from(bucket_d_id_videos)
+        .upload(fileNames + "/video_profile_" + fileNames + ".mp4", video, {
+          cacheControl: 3600,
+          upsert: true,
+        });
+
+    if (errorUploadVideoProfile) {
+      setError({
+        isError: true,
+        message: errorUploadVideoProfile.message,
+      });
+    } else {
+      setVideoSetted(true);
+    }
   };
 
   return (
@@ -487,7 +343,6 @@ function Avatars() {
               }}
             >
               <div className="talk-picture-container">
-                {console.log(sourceData)}
                 {sourceData.photo ? (
                   <img className="talk-picture" src={sourceData.photo} />
                 ) : (
@@ -502,7 +357,6 @@ function Avatars() {
                   accept="image/*"
                   onChange={async (e) => {
                     if (e.target.files.length > 0) {
-                      console.log(getFileExtension(e.target.files[0].name));
                       const { error: uploadPhotoError } = await supabase.storage
                         .from(bucket_d_id_pictures)
                         .upload(
@@ -618,6 +472,7 @@ function Avatars() {
               onClick={async (e) => {
                 e.preventDefault();
                 await handleUpload(e);
+                setVideoSetted(false);
               }}
               disabled={btnCreate.disabled}
             >
@@ -633,9 +488,11 @@ function Avatars() {
                 {user && (
                   <button
                     className="talk-button-2"
-                    onClick={(e) => {
+                    onClick={async (e) => {
                       e.preventDefault();
+                      await handleSetVideoProfile();
                     }}
+                    disabled={videoSetted}
                   >
                     Set as video presentation
                   </button>
@@ -664,7 +521,7 @@ async function saveIP(user, talkId) {
   const {
     data: { ip },
   } = await axios.get("https://api.ipify.org/?format=json");
-  // const { data , error }  = await supabase.from("d_id_talks").select().eq("ip", ""+ip);
+
   const { error: err } = await supabase
     .from("d_id_talks")
     .insert({ talkId: talkId, userId: user ? user.id : null, ip: ip });
@@ -714,8 +571,6 @@ async function changeVoiceId(userId, lastVoice, newVoiceId) {
       .from("d_id_voices")
       .update({ voiceId: newVoiceId })
       .eq("userId", userId);
-    console.log(data);
-    console.log(error);
   } else {
     const { data, error } = await supabase
       .from("d_id_voices")

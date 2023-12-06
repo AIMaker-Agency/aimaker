@@ -37,7 +37,7 @@ export async function createTalk(
             ssml: "false",
             audio_url: audio_url,
           },
-          config: { fluent: "false", pad_audio: "0.0" },
+          config: { fluent: "false", pad_audio: "0.0", stitch: true },
           source_url: picture_url,
         }
       : {
@@ -48,7 +48,7 @@ export async function createTalk(
             provider: { type: "microsoft", voice_id: "en-US-JennyNeural" },
             input: input,
           },
-          config: { fluent: "false", pad_audio: "0.0" },
+          config: { fluent: "false", pad_audio: "0.0", stitch: true },
           source_url: picture_url,
         };
 
@@ -87,19 +87,10 @@ export async function getTalkVideo(talkId: string): Promise<DIdResponse> {
       if (response.data.status === "done") {
         // Fetch the result when done
         try {
-          const res = await fetch(
-            response.data.result_url.replace(
-              "https://d-id-talks-prod.s3.us-west-2.amazonaws.com",
-              "/api"
-            )
-          );
-          const blobFile = await res.blob();
-          let videoFile = new File([blobFile], "video_profile.mp4", {
-            type: "video/mp4",
-          });
+          const video = await getVideoFile(response.data.result_url);
 
           responseTalk = {
-            data: { file: videoFile, result_url: response.data.result_url },
+            data: { file: video, result_url: response.data.result_url },
             error: undefined,
           };
           return responseTalk;
@@ -119,4 +110,15 @@ export async function getTalkVideo(talkId: string): Promise<DIdResponse> {
   };
 
   return checkStatus();
+}
+
+export async function getVideoFile(url: string): Promise<any> {
+  const res = await fetch(
+    url.replace("https://d-id-talks-prod.s3.us-west-2.amazonaws.com", "/api")
+  );
+  const blobFile = await res.blob();
+  let videoFile = new File([blobFile], "video_profile.mp4", {
+    type: "video/mp4",
+  });
+  return videoFile;
 }
