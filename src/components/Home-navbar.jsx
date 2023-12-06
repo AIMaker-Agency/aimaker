@@ -20,30 +20,30 @@ function HomeNavBar() {
 
   const MenuItems = [
     {
-      url: "./",
+      url: "/home/",
       title: "Home",
     },
     {
-      url: "./imagine",
+      url: "/home/imagine",
       title: "Imagine",
     },
     {
-      url: "./ido2020",
+      url: "/home/ido2020",
       title: "IDO 2020",
     },
     // {
     //   url: './social-contract', title: 'About social contract',
     // },
     {
-      url: "./members",
+      url: "/home/members",
       title: "Members",
     },
     {
-      url: "./",
+      url: "/home/",
       title: "Demos",
       submenu: [
         {
-          url: "../avatars",
+          url: "/avatars",
           title: "Avatars",
         },
       ],
