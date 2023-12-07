@@ -82,25 +82,28 @@ function Avatars() {
           await supabase.storage
             .from(bucket_d_id_pictures)
             .list("", { search: user.id });
+
         const { data: audioList, error: errorAudioList } =
           await supabase.storage
             .from(bucket_user_audios)
             .list("", { search: user.id });
 
-        if (pictureList && pictureList.length != 0 && !errorPictureList) {
+        if (
+          (pictureList && pictureList.length != 0 && !errorPictureList) ||
+          (audioList && audioList.length != 0 && !errorAudioList)
+        ) {
           const { data: dataImage } = supabase.storage
             .from(bucket_d_id_pictures)
             .getPublicUrl(pictureList[0].name);
-          setSourceData({ ...sourceData, photo: dataImage.publicUrl });
-        }
 
-        if (audioList && audioList.length != 0 && !errorAudioList) {
           const { data: dataAudio } = supabase.storage
             .from(bucket_user_audios)
             .getPublicUrl(audioList[0].name);
+
           setSourceData({
             ...sourceData,
-            audio: dataAudio.publicUrl,
+            audio: audioList.length != 0 ? dataAudio.publicUrl : null,
+            photo: pictureList.length != 0 ? dataImage.publicUrl : null,
           });
         }
 
