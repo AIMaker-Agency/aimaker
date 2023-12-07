@@ -46,6 +46,10 @@ function HomeNavBar() {
           url: "/avatars",
           title: "Avatars",
         },
+        {
+          url: "/chat",
+          title: "Chat with AI Maker",
+        },
       ],
     },
   ];
@@ -174,6 +178,7 @@ const NavBar = styled.nav`
   border-radius: 15px;
   display: flex;
   justify-content: space-between;
+  height: 3.2rem;
 
   .home-navbar,
   .home-navbar-login-btns {
@@ -181,9 +186,11 @@ const NavBar = styled.nav`
     flex: 1;
     align-items: center;
     position: relative;
+    list-style: none;
 
     .home-navbar-items {
       display: flex;
+      height: 3.1rem;
 
       @media (max-width: 768px) {
         display: none;
@@ -239,6 +246,15 @@ const NavBar = styled.nav`
 
       .home-navbar-dropdown-menu {
         position: absolute;
+        display: flex;
+        flex-direction: column;
+
+        .home-navbar-item {
+          width: 100%;
+          &:hover {
+            background-color: #abababff;
+          }
+        }
       }
 
       @media (max-width: 768px) {
@@ -258,7 +274,7 @@ const NavBar = styled.nav`
 
     .home-navbar-item:hover,
     .button-burguer:hover {
-      background-color: #22222266;
+      background-color: #abababff;
       cursor: pointer;
     }
   }

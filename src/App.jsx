@@ -6,6 +6,7 @@ import Avatars from "./pages/Avatars/Avatars";
 import Page404 from "./pages/404/404";
 import Homepage from "./pages/Home/Homepage";
 import Profile from "./pages/Profile/Profile";
+import ChatWithAIMaker from "./pages/Chat With AI Maker/ChatWithAIMaker";
 
 const supabase = getSupabaseClient();
 
@@ -21,6 +22,7 @@ function App() {
         <Route path="/home/*" element={<Homepage />} />
         <Route path="login" element={<Login />} />
         <Route path="avatars" element={<Avatars />} />
+        <Route path="chat" element={<ChatWithAIMaker />} />
         <Route path="profile/*" element={<Profile />} />
         <Route path="/*" element={<Page404 />} />
       </Routes>
