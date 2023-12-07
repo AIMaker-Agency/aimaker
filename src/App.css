@@ -347,10 +347,11 @@ body {
   border-radius: 50%;
   border: 0.7rem solid white;
   position: absolute;
-  top: -40%;
+  top: -10rem;
 }
 
-.profile-video-player {
+.profile-video-player,
+.profile-video-container img {
   border-radius: inherit;
   width: inherit;
   height: inherit;
