@@ -24,7 +24,8 @@ const supabase = getSupabaseClient();
 
 function Avatars() {
   const [session, setSession] = useState(null);
-  const [error, setError] = useState({
+  const [snackBar, setSnackBar] = useState({
+    isShowing: false,
     isError: false,
     message: "",
   });
@@ -136,7 +137,8 @@ function Avatars() {
 
   const handleUpload = async (e) => {
     if (!sourceData.photo) {
-      setError({
+      setSnackBar({
+        isShowing: true,
         isError: true,
         message: "Selecciona una foto para continuar",
       });
@@ -144,7 +146,8 @@ function Avatars() {
     }
 
     if (!sourceData.audio) {
-      setError({
+      setSnackBar({
+        isShowing: true,
         isError: true,
         message: "Selecciona un audio para continuar",
       });
@@ -152,7 +155,8 @@ function Avatars() {
     }
 
     if (talkText == "" || talkText == null) {
-      setError({
+      setSnackBar({
+        isShowing: true,
         isError: true,
         message: "Ingresa el texto que deseas para el video",
       });
@@ -209,7 +213,11 @@ function Avatars() {
       );
 
       if (addVoiceResponse.error) {
-        setError({ isError: true, message: addVoiceResponse.error.message });
+        setSnackBar({
+          isShowing: true,
+          isError: true,
+          message: addVoiceResponse.error.message,
+        });
         setBtnCreate({ disabled: false, text: "Create video" });
         return;
       }
@@ -253,7 +261,8 @@ function Avatars() {
         );
 
         if (createTalkResponse.error != null) {
-          setError({
+          setSnackBar({
+            isShowing: true,
             isError: true,
             message: createTalkResponse.error.message,
           });
@@ -295,18 +304,28 @@ function Avatars() {
               deleteFiles(fileNames);
             }
             if (voiceData.lastVoiceId) {
-              deleteVoice(voiceData.lastVoiceId);
+              const voiceDeleted = await deleteVoice(voiceData.lastVoiceId);
+              if (voiceDeleted.error) {
+                setSnackBar({
+                  isShowing: true,
+                  isError: true,
+                  message:
+                    "Voice can't be deleted. Please be sure that voice exist",
+                });
+              }
             }
           }
         } else {
-          setError({
+          setSnackBar({
+            isShowing: true,
             isError: true,
             message: getTalkVideoResponse.error.message,
           });
           setBtnCreate({ disabled: false, text: "Create video" });
         }
       } else {
-        setError({
+        setSnackBar({
+          isShowing: true,
           isError: true,
           message: errorUploadAudio.message,
         });
@@ -318,7 +337,6 @@ function Avatars() {
   };
 
   const handleSetVideoProfile = async () => {
-    console.log("Entra aquí");
     const video = await getVideoFile(sourceData.video);
 
     const { data: uploadVideoProfile, error: errorUploadVideoProfile } =
@@ -330,12 +348,18 @@ function Avatars() {
         });
 
     if (errorUploadVideoProfile) {
-      setError({
+      setSnackBar({
+        isShowing: true,
         isError: true,
         message: errorUploadVideoProfile.message,
       });
     } else {
       setVideoSetted(true);
+      setSnackBar({
+        isShowing: true,
+        isError: false,
+        message: "Video setted as video presentation",
+      });
     }
   };
 
@@ -515,13 +539,23 @@ function Avatars() {
           </div>
         </div>
       </AvatarsContainer>
-      {error.isError && (
-        <DivError>
-          <div className="avatars-error">{error.message}</div>
+      {snackBar.isShowing && (
+        <DivSnackbar
+          style={
+            snackBar.isError
+              ? { backgroundColor: "#f56e6e" }
+              : { backgroundColor: "green" }
+          }
+        >
+          <div className={"avatars-message"}>{snackBar.message}</div>
           {setTimeout(() => {
-            setError({ isError: false, message: "" });
+            setSnackBar({
+              isShowing: false,
+              isError: false,
+              message: "",
+            });
           }, 5000)}
-        </DivError>
+        </DivSnackbar>
       )}
     </>
   );
@@ -599,18 +633,17 @@ function getFileExtension(filename) {
 
 export default Avatars;
 
-const DivError = styled.div`
+const DivSnackbar = styled.div`
   width: 100%;
   position: absolute;
   bottom: 0px;
   height: 2rem;
   display: flex;
   align-items: center;
-  background-color: #f56e6e;
   border-radius: 1rem 1rem 0px 0px;
   color: transparent;
 
-  .avatars-error {
+  .avatars-message {
     color: white;
     width: 100%;
     bottom: 2px;

@@ -87,14 +87,25 @@ export async function textToSpeech(
   return responseTextToSpeech;
 }
 
-export async function deleteVoice(voiceId: string) {
-  const response = await axios.delete(
-    "https://api.elevenlabs.io/v1/voices/" + voiceId,
-    {
-      headers: {
-        accept: "application/json",
-        "xi-api-key": API_KEY,
-      },
-    }
-  );
+export async function deleteVoice(
+  voiceId: string
+): Promise<ElevenLabsResponse> {
+  var responseTextToSpeech: ElevenLabsResponse = {};
+  try {
+    const response = await axios.delete(
+      "https://api.elevenlabs.io/v1/voices/" + voiceId,
+      {
+        headers: {
+          accept: "application/json",
+          "xi-api-key": API_KEY,
+        },
+      }
+    );
+
+    responseTextToSpeech.data = { status: response.data.status };
+  } catch (error: any) {
+    responseTextToSpeech.error = error;
+  }
+
+  return responseTextToSpeech;
 }
