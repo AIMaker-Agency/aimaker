@@ -49,7 +49,6 @@ function Avatars() {
     video: null,
     photo: null,
   });
-  const [lastVoice, setLastVoice] = useState(null);
   // "https://d-id-talks-prod.s3.us-west-2.amazonaws.com/auth0%7C654a4feb41d204246e752bd6/tlk_Aw8UuG7-KJkB9HOMz5Seo/1701811481691.mp4?AWSAccessKeyId=AKIA5CUMPJBIK65W6FGA&Expires=1701897916&Signature=IPXaV2Oyv9N2b%2BHom2hhidvru%2F0%3D&X-Amzn-Trace-Id=Root%3D1-656f953c-5d122d841f5824f3041b6ea9%3BParent%3D9cc98d37d4da0196%3BSampled%3D1%3BLineage%3D6b931dd4%3A0",
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -215,8 +214,15 @@ function Avatars() {
         return;
       }
 
-      changeVoiceId(user.id, lastVoice, addVoiceResponse.data.voiceId);
-      setLastVoice(addVoiceResponse.data.voiceId);
+      changeVoiceId(
+        user.id,
+        voiceData.lastVoiceId,
+        addVoiceResponse.data.voiceId
+      );
+      setVoiceData({
+        ...voiceData,
+        lastVoiceId: addVoiceResponse.data.voiceId,
+      });
 
       const textToSpeechResponse = await textToSpeech(
         talkText,
@@ -288,7 +294,9 @@ function Avatars() {
             if (ipSaved && !user) {
               deleteFiles(fileNames);
             }
-            deleteVoice(lastVoice);
+            if (voiceData.lastVoiceId) {
+              deleteVoice(voiceData.lastVoiceId);
+            }
           }
         } else {
           setError({
