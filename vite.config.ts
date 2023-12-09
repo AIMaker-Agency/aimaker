@@ -27,7 +27,7 @@ export default defineConfig({
       "/api": {
         target: "https://d-id-talks-prod.s3.us-west-2.amazonaws.com",
         changeOrigin: true,
-        secure: false,
+        secure: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
     },

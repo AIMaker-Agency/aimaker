@@ -34,7 +34,10 @@ function Avatars() {
     disabled: false,
     text: "Create video",
   });
-  const [videoSetted, setVideoSetted] = useState(false);
+  const [btnSetVideoPresentation, setBtnSetVideoPresentation] = useState({
+    disabled: false,
+    text: "Set video presentation",
+  });
   const [fileNames, setFilenames] = useState(
     (Math.random() * 10).toString(36).replace(".", "")
   );
@@ -107,7 +110,7 @@ function Avatars() {
           });
         }
 
-        setVoiceData({ ...voiceData, lastVoiceId: await getVoiceId(user.id) });
+        // setVoiceData({ ...voiceData, lastVoiceId: await getVoiceId(user.id) });
       };
 
       fetchUserData();
@@ -175,7 +178,7 @@ function Avatars() {
       setBtnCreate({ ...btnCreate, disabled: true, text: "Loading..." });
 
       // const getTalkVideoResponse = await getTalkVideo(
-      //   "tlk_cUA06cOZXkm5B0-pcMWON"
+      //   "tlk_XPiy-SargYl6ttdy-To5z"
       // );
 
       // if (!getTalkVideoResponse.error) {
@@ -222,11 +225,11 @@ function Avatars() {
         return;
       }
 
-      changeVoiceId(
-        user.id,
-        voiceData.lastVoiceId,
-        addVoiceResponse.data.voiceId
-      );
+      // changeVoiceId(
+      //   user.id,
+      //   voiceData.lastVoiceId,
+      //   addVoiceResponse.data.voiceId
+      // );
       setVoiceData({
         ...voiceData,
         lastVoiceId: addVoiceResponse.data.voiceId,
@@ -303,17 +306,19 @@ function Avatars() {
             if (ipSaved && !user) {
               deleteFiles(fileNames);
             }
-            if (voiceData.lastVoiceId) {
-              const voiceDeleted = await deleteVoice(voiceData.lastVoiceId);
-              if (voiceDeleted.error) {
-                setSnackBar({
-                  isShowing: true,
-                  isError: true,
-                  message:
-                    "Voice can't be deleted. Please be sure that voice exist",
-                });
-              }
+
+            const voiceDeleted = await deleteVoice(
+              addVoiceResponse.data.voiceId
+            );
+            if (voiceDeleted.error) {
+              setSnackBar({
+                isShowing: true,
+                isError: true,
+                message:
+                  "Voice can't be deleted. Please be sure that voice exist",
+              });
             }
+            setVoiceData({ ...voiceData, lastVoiceId: null });
           }
         } else {
           setSnackBar({
@@ -337,6 +342,7 @@ function Avatars() {
   };
 
   const handleSetVideoProfile = async () => {
+    setBtnSetVideoPresentation({ disabled: true, text: "Loading..." });
     const video = await getVideoFile(sourceData.video);
 
     const { data: uploadVideoProfile, error: errorUploadVideoProfile } =
@@ -354,7 +360,7 @@ function Avatars() {
         message: errorUploadVideoProfile.message,
       });
     } else {
-      setVideoSetted(true);
+      setBtnSetVideoPresentation({ disabled: true, text: "Video setted" });
       setSnackBar({
         isShowing: true,
         isError: false,
@@ -506,7 +512,10 @@ function Avatars() {
               onClick={async (e) => {
                 e.preventDefault();
                 await handleUpload(e);
-                setVideoSetted(false);
+                setBtnSetVideoPresentation({
+                  text: "Set video presentation",
+                  disabled: false,
+                });
               }}
               disabled={btnCreate.disabled}
             >
@@ -526,9 +535,9 @@ function Avatars() {
                       e.preventDefault();
                       await handleSetVideoProfile();
                     }}
-                    disabled={videoSetted}
+                    disabled={btnSetVideoPresentation.disabled}
                   >
-                    Set as video presentation
+                    {btnSetVideoPresentation.text}
                   </button>
                 )}
                 <a href={sourceData.video} className="talk-button-2">
@@ -589,13 +598,21 @@ async function checkIp() {
 }
 
 async function deleteFiles(filename) {
+  const { data: pictureList, error: errorPictureList } = await supabase.storage
+    .from(bucket_d_id_pictures)
+    .list("", { search: filename });
+
+  const { data: audioList, error: errorAudioList } = await supabase.storage
+    .from(bucket_user_audios)
+    .list("", { search: filename });
+
   const { data: deletePictureData, error: deletePictureError } =
     await supabase.storage
       .from(bucket_d_id_pictures)
-      .remove([filename + ".jpg"]);
+      .remove([pictureList[0].name]);
 
   const { data: deleteAudioData, error: deleteAudioError } =
-    await supabase.storage.from(bucket_d_id_audios).remove([filename + ".m4a"]);
+    await supabase.storage.from(bucket_d_id_audios).remove([audioList[0].name]);
 }
 
 async function getVoiceId(userId) {
@@ -609,8 +626,11 @@ async function getVoiceId(userId) {
 async function changeVoiceId(userId, lastVoice, newVoiceId) {
   const lastVoiceId = lastVoice;
   if (lastVoiceId != "" && lastVoice != null) {
-    await deleteVoice(lastVoiceId);
+    // const voiceDeleted = await deleteVoice(lastVoiceId);
 
+    // if (!voiceDeleted.error) {
+
+    // }
     const { data, error } = await supabase
       .from("d_id_voices")
       .update({ voiceId: newVoiceId })
