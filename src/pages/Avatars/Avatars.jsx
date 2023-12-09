@@ -302,7 +302,10 @@ function Avatars() {
               video: getTalkVideoResponse.data.result_url,
             });
 
-            let ipSaved = await saveIP(user.id, createTalkResponse.data.talkId);
+            let ipSaved = await saveIP(
+              user ? user.id : null,
+              createTalkResponse.data.talkId
+            );
             if (ipSaved && !user) {
               deleteFiles(fileNames);
             }
@@ -570,14 +573,14 @@ function Avatars() {
   );
 }
 
-async function saveIP(user, talkId) {
+async function saveIP(userId, talkId) {
   const {
     data: { ip },
   } = await axios.get("https://api.ipify.org/?format=json");
 
   const { error: err } = await supabase
     .from("d_id_talks")
-    .insert({ talkId: talkId, userId: user ? user.id : null, ip: ip });
+    .insert({ talkId: talkId, userId: userId, ip: ip });
   if (err) {
     return false;
   } else {
