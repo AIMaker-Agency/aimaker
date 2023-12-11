@@ -1,5 +1,9 @@
 import { createClient } from "@supabase/supabase-js";
-import { bucket_d_id_pictures, bucket_d_id_videos } from "./supabase-constants";
+import {
+  bucket_d_id_pictures,
+  bucket_d_id_videos,
+  bucket_gpt_images,
+} from "./supabase-constants";
 
 // const ANON_KEY =
 //   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE";
@@ -69,4 +73,35 @@ export async function getVideoProfileUrl(userId) {
   }
 
   return video_url;
+}
+
+export async function UploadImageAndGetURL(bucket, path, file) {
+  let url = null;
+  const { data, error } = await supabase.storage
+    .from(bucket)
+    .upload(path, file, { upsert: true, cacheControl: 3600 });
+
+  if (!error) {
+    const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(path);
+    console.log(urlData);
+    url = urlData.publicUrl;
+    console.log(url);
+  }
+  return url;
+}
+
+export async function clearBucket(bucket, path) {
+  const { data: files, error: errorFiles } = await supabase.storage
+    .from(bucket)
+    .list(path);
+
+  if (files.length > 0) {
+    const { data, error } = await supabase.storage
+      .from(bucket)
+      .remove(files.map((file) => `${path}/${file.name}`));
+
+    return !error;
+  }
+
+  return true;
 }

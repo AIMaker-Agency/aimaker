@@ -12,6 +12,7 @@
     "@vitejs/plugin-basic-ssl": "^1.0.2",
     "@vitejs/plugin-react-swc": "^3.5.0",
     "axios": "^1.5.1",
+    "openai": "^4.20.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.12.0",
